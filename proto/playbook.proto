@@ -9,3 +9,12 @@ message LogEntry {
     string content = 3; // The actual data string
     int64 timestamp = 4;
 }
+
+// universal envelope for RegistaDB
+message RegistaRequest {
+    oneof payload {
+        LogEntry store_request = 1;
+        int32 fetch_id = 2;
+        string status_check = 3; // Example: "PING"
+    }
+}

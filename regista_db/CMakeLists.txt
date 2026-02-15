@@ -23,7 +23,9 @@ protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_SRC})
 
 # 4. Add the generated files to your executable
 add_executable(registadb_engine 
-    src/main.cpp 
+    src/main.cpp
+    src/StorageManager.cpp 
+    src/RegistaServer.cpp 
     ${PROTO_SRCS} 
     ${PROTO_HDRS}
 )

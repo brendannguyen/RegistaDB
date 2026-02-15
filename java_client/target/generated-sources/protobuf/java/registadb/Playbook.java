@@ -943,11 +943,1070 @@ public final class Playbook {
 
   }
 
+  public interface RegistaRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:registadb.RegistaRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.registadb.LogEntry store_request = 1;</code>
+     * @return Whether the storeRequest field is set.
+     */
+    boolean hasStoreRequest();
+    /**
+     * <code>.registadb.LogEntry store_request = 1;</code>
+     * @return The storeRequest.
+     */
+    registadb.Playbook.LogEntry getStoreRequest();
+    /**
+     * <code>.registadb.LogEntry store_request = 1;</code>
+     */
+    registadb.Playbook.LogEntryOrBuilder getStoreRequestOrBuilder();
+
+    /**
+     * <code>int32 fetch_id = 2;</code>
+     * @return Whether the fetchId field is set.
+     */
+    boolean hasFetchId();
+    /**
+     * <code>int32 fetch_id = 2;</code>
+     * @return The fetchId.
+     */
+    int getFetchId();
+
+    /**
+     * <pre>
+     * Example: "PING"
+     * </pre>
+     *
+     * <code>string status_check = 3;</code>
+     * @return Whether the statusCheck field is set.
+     */
+    boolean hasStatusCheck();
+    /**
+     * <pre>
+     * Example: "PING"
+     * </pre>
+     *
+     * <code>string status_check = 3;</code>
+     * @return The statusCheck.
+     */
+    java.lang.String getStatusCheck();
+    /**
+     * <pre>
+     * Example: "PING"
+     * </pre>
+     *
+     * <code>string status_check = 3;</code>
+     * @return The bytes for statusCheck.
+     */
+    com.google.protobuf.ByteString
+        getStatusCheckBytes();
+
+    public registadb.Playbook.RegistaRequest.PayloadCase getPayloadCase();
+  }
+  /**
+   * <pre>
+   * universal envelope for RegistaDB
+   * </pre>
+   *
+   * Protobuf type {@code registadb.RegistaRequest}
+   */
+  public static final class RegistaRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:registadb.RegistaRequest)
+      RegistaRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use RegistaRequest.newBuilder() to construct.
+    private RegistaRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private RegistaRequest() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new RegistaRequest();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return registadb.Playbook.internal_static_registadb_RegistaRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return registadb.Playbook.internal_static_registadb_RegistaRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              registadb.Playbook.RegistaRequest.class, registadb.Playbook.RegistaRequest.Builder.class);
+    }
+
+    private int payloadCase_ = 0;
+    private java.lang.Object payload_;
+    public enum PayloadCase
+        implements com.google.protobuf.Internal.EnumLite,
+            com.google.protobuf.AbstractMessage.InternalOneOfEnum {
+      STORE_REQUEST(1),
+      FETCH_ID(2),
+      STATUS_CHECK(3),
+      PAYLOAD_NOT_SET(0);
+      private final int value;
+      private PayloadCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @param value The number of the enum to look for.
+       * @return The enum associated with the given number.
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static PayloadCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static PayloadCase forNumber(int value) {
+        switch (value) {
+          case 1: return STORE_REQUEST;
+          case 2: return FETCH_ID;
+          case 3: return STATUS_CHECK;
+          case 0: return PAYLOAD_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public PayloadCase
+    getPayloadCase() {
+      return PayloadCase.forNumber(
+          payloadCase_);
+    }
+
+    public static final int STORE_REQUEST_FIELD_NUMBER = 1;
+    /**
+     * <code>.registadb.LogEntry store_request = 1;</code>
+     * @return Whether the storeRequest field is set.
+     */
+    @java.lang.Override
+    public boolean hasStoreRequest() {
+      return payloadCase_ == 1;
+    }
+    /**
+     * <code>.registadb.LogEntry store_request = 1;</code>
+     * @return The storeRequest.
+     */
+    @java.lang.Override
+    public registadb.Playbook.LogEntry getStoreRequest() {
+      if (payloadCase_ == 1) {
+         return (registadb.Playbook.LogEntry) payload_;
+      }
+      return registadb.Playbook.LogEntry.getDefaultInstance();
+    }
+    /**
+     * <code>.registadb.LogEntry store_request = 1;</code>
+     */
+    @java.lang.Override
+    public registadb.Playbook.LogEntryOrBuilder getStoreRequestOrBuilder() {
+      if (payloadCase_ == 1) {
+         return (registadb.Playbook.LogEntry) payload_;
+      }
+      return registadb.Playbook.LogEntry.getDefaultInstance();
+    }
+
+    public static final int FETCH_ID_FIELD_NUMBER = 2;
+    /**
+     * <code>int32 fetch_id = 2;</code>
+     * @return Whether the fetchId field is set.
+     */
+    @java.lang.Override
+    public boolean hasFetchId() {
+      return payloadCase_ == 2;
+    }
+    /**
+     * <code>int32 fetch_id = 2;</code>
+     * @return The fetchId.
+     */
+    @java.lang.Override
+    public int getFetchId() {
+      if (payloadCase_ == 2) {
+        return (java.lang.Integer) payload_;
+      }
+      return 0;
+    }
+
+    public static final int STATUS_CHECK_FIELD_NUMBER = 3;
+    /**
+     * <pre>
+     * Example: "PING"
+     * </pre>
+     *
+     * <code>string status_check = 3;</code>
+     * @return Whether the statusCheck field is set.
+     */
+    public boolean hasStatusCheck() {
+      return payloadCase_ == 3;
+    }
+    /**
+     * <pre>
+     * Example: "PING"
+     * </pre>
+     *
+     * <code>string status_check = 3;</code>
+     * @return The statusCheck.
+     */
+    public java.lang.String getStatusCheck() {
+      java.lang.Object ref = "";
+      if (payloadCase_ == 3) {
+        ref = payload_;
+      }
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (payloadCase_ == 3) {
+          payload_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Example: "PING"
+     * </pre>
+     *
+     * <code>string status_check = 3;</code>
+     * @return The bytes for statusCheck.
+     */
+    public com.google.protobuf.ByteString
+        getStatusCheckBytes() {
+      java.lang.Object ref = "";
+      if (payloadCase_ == 3) {
+        ref = payload_;
+      }
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        if (payloadCase_ == 3) {
+          payload_ = b;
+        }
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (payloadCase_ == 1) {
+        output.writeMessage(1, (registadb.Playbook.LogEntry) payload_);
+      }
+      if (payloadCase_ == 2) {
+        output.writeInt32(
+            2, (int)((java.lang.Integer) payload_));
+      }
+      if (payloadCase_ == 3) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, payload_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (payloadCase_ == 1) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, (registadb.Playbook.LogEntry) payload_);
+      }
+      if (payloadCase_ == 2) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(
+              2, (int)((java.lang.Integer) payload_));
+      }
+      if (payloadCase_ == 3) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, payload_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof registadb.Playbook.RegistaRequest)) {
+        return super.equals(obj);
+      }
+      registadb.Playbook.RegistaRequest other = (registadb.Playbook.RegistaRequest) obj;
+
+      if (!getPayloadCase().equals(other.getPayloadCase())) return false;
+      switch (payloadCase_) {
+        case 1:
+          if (!getStoreRequest()
+              .equals(other.getStoreRequest())) return false;
+          break;
+        case 2:
+          if (getFetchId()
+              != other.getFetchId()) return false;
+          break;
+        case 3:
+          if (!getStatusCheck()
+              .equals(other.getStatusCheck())) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      switch (payloadCase_) {
+        case 1:
+          hash = (37 * hash) + STORE_REQUEST_FIELD_NUMBER;
+          hash = (53 * hash) + getStoreRequest().hashCode();
+          break;
+        case 2:
+          hash = (37 * hash) + FETCH_ID_FIELD_NUMBER;
+          hash = (53 * hash) + getFetchId();
+          break;
+        case 3:
+          hash = (37 * hash) + STATUS_CHECK_FIELD_NUMBER;
+          hash = (53 * hash) + getStatusCheck().hashCode();
+          break;
+        case 0:
+        default:
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static registadb.Playbook.RegistaRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static registadb.Playbook.RegistaRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static registadb.Playbook.RegistaRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static registadb.Playbook.RegistaRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static registadb.Playbook.RegistaRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static registadb.Playbook.RegistaRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static registadb.Playbook.RegistaRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static registadb.Playbook.RegistaRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static registadb.Playbook.RegistaRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static registadb.Playbook.RegistaRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static registadb.Playbook.RegistaRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static registadb.Playbook.RegistaRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(registadb.Playbook.RegistaRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * universal envelope for RegistaDB
+     * </pre>
+     *
+     * Protobuf type {@code registadb.RegistaRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:registadb.RegistaRequest)
+        registadb.Playbook.RegistaRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return registadb.Playbook.internal_static_registadb_RegistaRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return registadb.Playbook.internal_static_registadb_RegistaRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                registadb.Playbook.RegistaRequest.class, registadb.Playbook.RegistaRequest.Builder.class);
+      }
+
+      // Construct using registadb.Playbook.RegistaRequest.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        if (storeRequestBuilder_ != null) {
+          storeRequestBuilder_.clear();
+        }
+        payloadCase_ = 0;
+        payload_ = null;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return registadb.Playbook.internal_static_registadb_RegistaRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public registadb.Playbook.RegistaRequest getDefaultInstanceForType() {
+        return registadb.Playbook.RegistaRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public registadb.Playbook.RegistaRequest build() {
+        registadb.Playbook.RegistaRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public registadb.Playbook.RegistaRequest buildPartial() {
+        registadb.Playbook.RegistaRequest result = new registadb.Playbook.RegistaRequest(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        buildPartialOneofs(result);
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(registadb.Playbook.RegistaRequest result) {
+        int from_bitField0_ = bitField0_;
+      }
+
+      private void buildPartialOneofs(registadb.Playbook.RegistaRequest result) {
+        result.payloadCase_ = payloadCase_;
+        result.payload_ = this.payload_;
+        if (payloadCase_ == 1 &&
+            storeRequestBuilder_ != null) {
+          result.payload_ = storeRequestBuilder_.build();
+        }
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof registadb.Playbook.RegistaRequest) {
+          return mergeFrom((registadb.Playbook.RegistaRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(registadb.Playbook.RegistaRequest other) {
+        if (other == registadb.Playbook.RegistaRequest.getDefaultInstance()) return this;
+        switch (other.getPayloadCase()) {
+          case STORE_REQUEST: {
+            mergeStoreRequest(other.getStoreRequest());
+            break;
+          }
+          case FETCH_ID: {
+            setFetchId(other.getFetchId());
+            break;
+          }
+          case STATUS_CHECK: {
+            payloadCase_ = 3;
+            payload_ = other.payload_;
+            onChanged();
+            break;
+          }
+          case PAYLOAD_NOT_SET: {
+            break;
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                input.readMessage(
+                    getStoreRequestFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                payloadCase_ = 1;
+                break;
+              } // case 10
+              case 16: {
+                payload_ = input.readInt32();
+                payloadCase_ = 2;
+                break;
+              } // case 16
+              case 26: {
+                java.lang.String s = input.readStringRequireUtf8();
+                payloadCase_ = 3;
+                payload_ = s;
+                break;
+              } // case 26
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int payloadCase_ = 0;
+      private java.lang.Object payload_;
+      public PayloadCase
+          getPayloadCase() {
+        return PayloadCase.forNumber(
+            payloadCase_);
+      }
+
+      public Builder clearPayload() {
+        payloadCase_ = 0;
+        payload_ = null;
+        onChanged();
+        return this;
+      }
+
+      private int bitField0_;
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          registadb.Playbook.LogEntry, registadb.Playbook.LogEntry.Builder, registadb.Playbook.LogEntryOrBuilder> storeRequestBuilder_;
+      /**
+       * <code>.registadb.LogEntry store_request = 1;</code>
+       * @return Whether the storeRequest field is set.
+       */
+      @java.lang.Override
+      public boolean hasStoreRequest() {
+        return payloadCase_ == 1;
+      }
+      /**
+       * <code>.registadb.LogEntry store_request = 1;</code>
+       * @return The storeRequest.
+       */
+      @java.lang.Override
+      public registadb.Playbook.LogEntry getStoreRequest() {
+        if (storeRequestBuilder_ == null) {
+          if (payloadCase_ == 1) {
+            return (registadb.Playbook.LogEntry) payload_;
+          }
+          return registadb.Playbook.LogEntry.getDefaultInstance();
+        } else {
+          if (payloadCase_ == 1) {
+            return storeRequestBuilder_.getMessage();
+          }
+          return registadb.Playbook.LogEntry.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.registadb.LogEntry store_request = 1;</code>
+       */
+      public Builder setStoreRequest(registadb.Playbook.LogEntry value) {
+        if (storeRequestBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          payload_ = value;
+          onChanged();
+        } else {
+          storeRequestBuilder_.setMessage(value);
+        }
+        payloadCase_ = 1;
+        return this;
+      }
+      /**
+       * <code>.registadb.LogEntry store_request = 1;</code>
+       */
+      public Builder setStoreRequest(
+          registadb.Playbook.LogEntry.Builder builderForValue) {
+        if (storeRequestBuilder_ == null) {
+          payload_ = builderForValue.build();
+          onChanged();
+        } else {
+          storeRequestBuilder_.setMessage(builderForValue.build());
+        }
+        payloadCase_ = 1;
+        return this;
+      }
+      /**
+       * <code>.registadb.LogEntry store_request = 1;</code>
+       */
+      public Builder mergeStoreRequest(registadb.Playbook.LogEntry value) {
+        if (storeRequestBuilder_ == null) {
+          if (payloadCase_ == 1 &&
+              payload_ != registadb.Playbook.LogEntry.getDefaultInstance()) {
+            payload_ = registadb.Playbook.LogEntry.newBuilder((registadb.Playbook.LogEntry) payload_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            payload_ = value;
+          }
+          onChanged();
+        } else {
+          if (payloadCase_ == 1) {
+            storeRequestBuilder_.mergeFrom(value);
+          } else {
+            storeRequestBuilder_.setMessage(value);
+          }
+        }
+        payloadCase_ = 1;
+        return this;
+      }
+      /**
+       * <code>.registadb.LogEntry store_request = 1;</code>
+       */
+      public Builder clearStoreRequest() {
+        if (storeRequestBuilder_ == null) {
+          if (payloadCase_ == 1) {
+            payloadCase_ = 0;
+            payload_ = null;
+            onChanged();
+          }
+        } else {
+          if (payloadCase_ == 1) {
+            payloadCase_ = 0;
+            payload_ = null;
+          }
+          storeRequestBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.registadb.LogEntry store_request = 1;</code>
+       */
+      public registadb.Playbook.LogEntry.Builder getStoreRequestBuilder() {
+        return getStoreRequestFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.registadb.LogEntry store_request = 1;</code>
+       */
+      @java.lang.Override
+      public registadb.Playbook.LogEntryOrBuilder getStoreRequestOrBuilder() {
+        if ((payloadCase_ == 1) && (storeRequestBuilder_ != null)) {
+          return storeRequestBuilder_.getMessageOrBuilder();
+        } else {
+          if (payloadCase_ == 1) {
+            return (registadb.Playbook.LogEntry) payload_;
+          }
+          return registadb.Playbook.LogEntry.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.registadb.LogEntry store_request = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          registadb.Playbook.LogEntry, registadb.Playbook.LogEntry.Builder, registadb.Playbook.LogEntryOrBuilder> 
+          getStoreRequestFieldBuilder() {
+        if (storeRequestBuilder_ == null) {
+          if (!(payloadCase_ == 1)) {
+            payload_ = registadb.Playbook.LogEntry.getDefaultInstance();
+          }
+          storeRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              registadb.Playbook.LogEntry, registadb.Playbook.LogEntry.Builder, registadb.Playbook.LogEntryOrBuilder>(
+                  (registadb.Playbook.LogEntry) payload_,
+                  getParentForChildren(),
+                  isClean());
+          payload_ = null;
+        }
+        payloadCase_ = 1;
+        onChanged();
+        return storeRequestBuilder_;
+      }
+
+      /**
+       * <code>int32 fetch_id = 2;</code>
+       * @return Whether the fetchId field is set.
+       */
+      public boolean hasFetchId() {
+        return payloadCase_ == 2;
+      }
+      /**
+       * <code>int32 fetch_id = 2;</code>
+       * @return The fetchId.
+       */
+      public int getFetchId() {
+        if (payloadCase_ == 2) {
+          return (java.lang.Integer) payload_;
+        }
+        return 0;
+      }
+      /**
+       * <code>int32 fetch_id = 2;</code>
+       * @param value The fetchId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFetchId(int value) {
+        
+        payloadCase_ = 2;
+        payload_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 fetch_id = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFetchId() {
+        if (payloadCase_ == 2) {
+          payloadCase_ = 0;
+          payload_ = null;
+          onChanged();
+        }
+        return this;
+      }
+
+      /**
+       * <pre>
+       * Example: "PING"
+       * </pre>
+       *
+       * <code>string status_check = 3;</code>
+       * @return Whether the statusCheck field is set.
+       */
+      @java.lang.Override
+      public boolean hasStatusCheck() {
+        return payloadCase_ == 3;
+      }
+      /**
+       * <pre>
+       * Example: "PING"
+       * </pre>
+       *
+       * <code>string status_check = 3;</code>
+       * @return The statusCheck.
+       */
+      @java.lang.Override
+      public java.lang.String getStatusCheck() {
+        java.lang.Object ref = "";
+        if (payloadCase_ == 3) {
+          ref = payload_;
+        }
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (payloadCase_ == 3) {
+            payload_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Example: "PING"
+       * </pre>
+       *
+       * <code>string status_check = 3;</code>
+       * @return The bytes for statusCheck.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString
+          getStatusCheckBytes() {
+        java.lang.Object ref = "";
+        if (payloadCase_ == 3) {
+          ref = payload_;
+        }
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          if (payloadCase_ == 3) {
+            payload_ = b;
+          }
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Example: "PING"
+       * </pre>
+       *
+       * <code>string status_check = 3;</code>
+       * @param value The statusCheck to set.
+       * @return This builder for chaining.
+       */
+      public Builder setStatusCheck(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        payloadCase_ = 3;
+        payload_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Example: "PING"
+       * </pre>
+       *
+       * <code>string status_check = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearStatusCheck() {
+        if (payloadCase_ == 3) {
+          payloadCase_ = 0;
+          payload_ = null;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Example: "PING"
+       * </pre>
+       *
+       * <code>string status_check = 3;</code>
+       * @param value The bytes for statusCheck to set.
+       * @return This builder for chaining.
+       */
+      public Builder setStatusCheckBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        payloadCase_ = 3;
+        payload_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:registadb.RegistaRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:registadb.RegistaRequest)
+    private static final registadb.Playbook.RegistaRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new registadb.Playbook.RegistaRequest();
+    }
+
+    public static registadb.Playbook.RegistaRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<RegistaRequest>
+        PARSER = new com.google.protobuf.AbstractParser<RegistaRequest>() {
+      @java.lang.Override
+      public RegistaRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<RegistaRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RegistaRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public registadb.Playbook.RegistaRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_registadb_LogEntry_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_registadb_LogEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_registadb_RegistaRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_registadb_RegistaRequest_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -959,7 +2018,10 @@ public final class Playbook {
     java.lang.String[] descriptorData = {
       "\n\016playbook.proto\022\tregistadb\"L\n\010LogEntry\022" +
       "\n\n\002id\030\001 \001(\004\022\020\n\010category\030\002 \001(\t\022\017\n\007content" +
-      "\030\003 \001(\t\022\021\n\ttimestamp\030\004 \001(\003b\006proto3"
+      "\030\003 \001(\t\022\021\n\ttimestamp\030\004 \001(\003\"u\n\016RegistaRequ" +
+      "est\022,\n\rstore_request\030\001 \001(\0132\023.registadb.L" +
+      "ogEntryH\000\022\022\n\010fetch_id\030\002 \001(\005H\000\022\026\n\014status_" +
+      "check\030\003 \001(\tH\000B\t\n\007payloadb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -971,6 +2033,12 @@ public final class Playbook {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_registadb_LogEntry_descriptor,
         new java.lang.String[] { "Id", "Category", "Content", "Timestamp", });
+    internal_static_registadb_RegistaRequest_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_registadb_RegistaRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_registadb_RegistaRequest_descriptor,
+        new java.lang.String[] { "StoreRequest", "FetchId", "StatusCheck", "Payload", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
