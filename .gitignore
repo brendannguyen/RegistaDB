@@ -1,0 +1,9 @@
+# Ignore C++ build folder
+regista_db/build
+
+# Ignore database data
+regista_db/data
+
+# Ignore IDE specific files
+.vscode/
+.idea/
