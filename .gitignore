@@ -4,6 +4,9 @@ regista_db/build
 # Ignore database data
 regista_db/data
 
+# Ignore manual generated files
+regista_db/generated
+
 # Ignore IDE specific files
 .vscode/
 .idea/

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package registadb;
+
+// This is the "Play" - the data packet Java sends to C++
+message LogEntry {
+    uint64 id = 1;
+    string category = 2; // e.g., "USER_ACTION", "SYSTEM_LOG"
+    string content = 3; // The actual data string
+    int64 timestamp = 4;
+}

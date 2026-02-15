@@ -4,14 +4,15 @@ A high-performance C++ middleware engine using RocksDB to orchestrate data inges
 
 ## Guide
 
-### Setup RocksDB
+### Setup RocksDB & RegistaDB Engine
 
 1. Install dependencies
 
 ```
 sudo apt update
-sudo apt install librocksdb-dev libsnappy-dev libzstd-dev liblz4-dev libbz2-dev zlib1g-dev
+sudo apt install librocksdb-dev libsnappy-dev libzstd-dev liblz4-dev libbz2-dev zlib1g-dev rocksdb-tools
 sudo apt install build-essential gdb
+sudo apt install protobuf-compiler
 ```
 
 2. Create C++ build files
@@ -29,4 +30,25 @@ make
 
 ```
 ./registadb_engine
+```
+
+### Development Guide
+
+#### Playbook changes (proto)
+
+1. Rebuild registaDB engine
+
+```
+cd regista_db/build
+cmake ..
+make
+```
+
+#### Engine Changes (src, c++)
+
+1. Compile & run
+
+```
+cd regista_db/build
+make && ./registadb_engine
 ```
