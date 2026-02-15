@@ -52,6 +52,7 @@ mvn compile
 
 ```
 mvn exec:java -Dexec.mainClass="com.registadb.Producer"
+mvn exec:java -Dexec.mainClass="com.registadb.Producer" -Dexec.args="500"
 ```
 
 ### Development Guide

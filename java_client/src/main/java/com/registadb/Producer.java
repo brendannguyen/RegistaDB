@@ -7,19 +7,36 @@ import org.zeromq.ZContext;
 
 public class Producer {
     public static void main(String[] args) throws Exception {
+        // Determine how many messages to send
+        int numEntries = 1; 
+        if (args.length > 0) {
+            try {
+                numEntries = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                System.err.println("Argument must be an integer. Defaulting to 1.");
+            }
+        }
+
         try (ZContext context = new ZContext()) {
             ZMQ.Socket socket = context.createSocket(ZMQ.PUSH);
             socket.connect("tcp://localhost:5555"); // Connect to the C++ engine
 
-            LogEntry entry = LogEntry.newBuilder()
-                .setId(311)
-                .setCategory("NETWORK_PLAY")
-                .setContent("Sent over ZeroMQ!")
-                .setTimestamp(System.currentTimeMillis())
-                .build();
+            System.out.println("Starting bulk upload of " + numEntries + " logs..." );
+            long startTime = System.currentTimeMillis();
 
-            socket.send(entry.toByteArray());
-            System.out.println("Java: Pushed message to C++ over port 5555");
+            for (int i = 0; i < numEntries; i++) {
+                LogEntry entry = LogEntry.newBuilder()
+                    .setId(i)
+                    .setCategory("STRESS_TEST")
+                    .setContent("Bulk message number " + i)
+                    .setTimestamp(System.currentTimeMillis() + i) // Offset to ensure unique keys
+                    .build();
+
+                socket.send(entry.toByteArray());
+            }
+
+            long endTime = System.currentTimeMillis();
+            System.out.println("Finished! Sent " + numEntries + " messages in " + (endTime - startTime) + "ms");
         }
     }
 }
