@@ -12,7 +12,7 @@ public class Producer {
             socket.connect("tcp://localhost:5555"); // Connect to the C++ engine
 
             LogEntry entry = LogEntry.newBuilder()
-                .setId(304)
+                .setId(311)
                 .setCategory("NETWORK_PLAY")
                 .setContent("Sent over ZeroMQ!")
                 .setTimestamp(System.currentTimeMillis())
