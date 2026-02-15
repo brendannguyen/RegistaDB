@@ -18,8 +18,8 @@ sudo apt install protobuf-compiler
 2. Create C++ build files
 
 ```
+mkdir data
 mkdir regista_db/build
-mkdir regista_db/data
 cd regista_db/build
 
 cmake ..
@@ -30,6 +30,27 @@ make
 
 ```
 ./registadb_engine
+```
+
+### Setup java client
+
+1. Install dependenices
+
+```
+sudo apt install maven
+```
+
+2. Compile
+
+```
+cd java_client
+mvn compile
+```
+
+3. Run Java Producer
+
+```
+mvn exec:java -Dexec.mainClass="com.registadb.Producer"
 ```
 
 ### Development Guide
