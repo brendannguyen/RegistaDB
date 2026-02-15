@@ -14,6 +14,9 @@ find_library(SNAPPY_LIB snappy REQUIRED)
 # 2. Find Protobuf
 find_package(Protobuf REQUIRED)
 
+# 2b. Find ZeroMQ
+find_library(ZMQ_LIB zmq REQUIRED)
+
 # 3. Tell CMake where to find your .proto file and where to put the generated code
 set(PROTO_SRC "../proto/playbook.proto")
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_SRC})
@@ -38,6 +41,7 @@ target_link_libraries(registadb_engine
     ${ZSTD_LIB}
     ${SNAPPY_LIB}
     ${Protobuf_LIBRARIES}
+    ${ZMQ_LIB}
     pthread 
     dl
 )

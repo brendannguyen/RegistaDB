@@ -13,13 +13,14 @@ sudo apt update
 sudo apt install librocksdb-dev libsnappy-dev libzstd-dev liblz4-dev libbz2-dev zlib1g-dev rocksdb-tools
 sudo apt install build-essential gdb
 sudo apt install protobuf-compiler
+sudo apt install libzmq3-dev
 ```
 
 2. Create C++ build files
 
 ```
+mkdir data
 mkdir regista_db/build
-mkdir regista_db/data
 cd regista_db/build
 
 cmake ..
@@ -30,6 +31,28 @@ make
 
 ```
 ./registadb_engine
+```
+
+### Setup java client
+
+1. Install dependenices
+
+```
+sudo apt install maven
+```
+
+2. Compile
+
+```
+cd java_client
+mvn compile
+```
+
+3. Run Java Producer
+
+```
+mvn exec:java -Dexec.mainClass="com.registadb.Producer"
+mvn exec:java -Dexec.mainClass="com.registadb.Producer" -Dexec.args="500"
 ```
 
 ### Development Guide
@@ -51,4 +74,19 @@ make
 ```
 cd regista_db/build
 make && ./registadb_engine
+```
+
+### Client changes (java)
+
+1. Compile
+
+```
+cd java_client
+mvn compile
+```
+
+2. Run Producer
+
+```
+mvn exec:java -Dexec.mainClass="com.registadb.Producer"
 ```

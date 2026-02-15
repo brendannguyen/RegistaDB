@@ -1,50 +1,65 @@
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <zmq.hpp>
 #include "rocksdb/db.h"
-#include "playbook.pb.h" // This is the generated header
+#include "playbook.pb.h" // The generated header
+
+// Global flag to handle graceful shutdown
+bool keep_running = true;
+void signal_handler(int s) { keep_running = false; }
 
 int main() {
-    // 1. Create a "Play" using the Protobuf class
-    registadb::LogEntry entry;
-    entry.set_id(101);
-    entry.set_category("TRANSFER");
-    entry.set_content("Player transferred from Java to C++");
-    entry.set_timestamp(123456789);
+    // Signal Handler (Ctrl+C)
+    signal(SIGINT, signal_handler);
 
-    // 2. Serialize it (turn it into a string of bytes)
-    std::string serialized_data;
-    entry.SerializeToString(&serialized_data);
-
-    // 3. Open RocksDB (Simplified for this test)
+    // Initialise RocksDB
     rocksdb::DB* db;
     rocksdb::Options options;
     options.create_if_missing = true;
-    rocksdb::Status status = rocksdb::DB::Open(options, "../data/registadb_store", &db);
-
-    if (!status.ok()) return 1;
-
-    // 4. Save the Protobuf "Play" into RocksDB
-    db->Put(rocksdb::WriteOptions(), "last_play", serialized_data);
-    std::cout << "RegistaDB: Successfully stored a Protobuf message!" << std::endl;
-
-    // 5. Read it back
-    std::string read_value;
-    status = db->Get(rocksdb::ReadOptions(), "last_play", &read_value);
-
-    if (status.ok()) {
-        registadb::LogEntry read_entry;
-        // Turn the bytes back into a C++ object
-        if (read_entry.ParseFromString(read_value)) {
-            std::cout << "--- Verified Data from Disk ---" << std::endl;
-            std::cout << "ID: " << read_entry.id() << std::endl;
-            std::cout << "Category: " << read_entry.category() << std::endl;
-            std::cout << "Content: " << read_entry.content() << std::endl;
-        }
-    } else {
-        std::cerr << "Failed to retrieve data!" << std::endl;
+    rocksdb::Status status = rocksdb::DB::Open(options, "../../data/registadb_store", &db);
+    if (!status.ok()) {
+        std::cerr << "RocksDB failed: " << status.ToString() << std::endl;
+        return 1;
     }
 
+    // Setup ZeroMQ
+    zmq::context_t context(1);
+    zmq::socket_t socket(context, ZMQ_PULL);
+    socket.bind("tcp://*:5555");
 
+    std::cout << "RegistaDB Engine is LIVE. Press Ctrl+C to stop." << std::endl;
+
+    // Service Loop
+    try {
+        while (keep_running) {
+            zmq::message_t message;
+            // timeout until message received
+            auto res = socket.recv(message, zmq::recv_flags::none);
+
+            if (message.size() > 0) {
+                registadb::LogEntry entry;
+                if (entry.ParseFromArray(message.data(), message.size())) {
+                    // store in rocksdb
+                    std::string serialized;
+                    entry.SerializeToString(&serialized);
+                    std::string key = "log_" + std::to_string(entry.timestamp());
+
+                    db->Put(rocksdb::WriteOptions(), key, serialized);
+
+                    std::cout << "[STORED] ID: " << entry.id() << " Category: " << entry.category() << std::endl;
+                }
+            } 
+        }
+    } catch (const zmq::error_t& e) {
+        // ignore error if "Interrupted"
+        if (e.num() != EINTR) { 
+            std::cerr << "ZMQ Error: " << e.what() << std::endl;
+        }
+    }
+    
+    // Cleanup
+    std::cout << "\nShutting down RegistaDB safely..." << std::endl;
     delete db;
     return 0;
 }
