@@ -15,14 +15,14 @@ public class TestRegistaClient {
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
-            // Step 1: Push to the fast lane
+            // push to the fast lane
             System.out.println("Pushing log to Port 5555...");
             client.pushLog(newLog);
 
-            // Step 2: Small sleep to ensure C++ has processed the pull
+            // small sleep to ensure C++ has processed the pull
             Thread.sleep(100);
 
-            // Step 3: Query from the smart lane
+            // query from the smart lane
             System.out.println("Querying for ID " + testId + " on Port 5556...");
             LogEntry fetched = client.fetchById(testId);
 

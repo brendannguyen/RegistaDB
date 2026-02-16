@@ -23,12 +23,12 @@ public class RegistaClient implements AutoCloseable {
         this.reqSocket.connect("tcp://" + host + ":5556");
     }
 
-    // 1. High-Speed Ingest (Uses Port 5555)
+    // high-Speed Ingest (Uses Port 5555)
     public void pushLog(LogEntry entry) {
         pushSocket.send(entry.toByteArray());
     }
 
-    // 2. Verified Ingest (Uses Port 5556 via oneof envelope)
+    // verified Ingest (Uses Port 5556 via oneof envelope)
     public boolean storeLogVerified(LogEntry entry) {
         RegistaRequest request = RegistaRequest.newBuilder()
                 .setStoreRequest(entry)
@@ -38,7 +38,7 @@ public class RegistaClient implements AutoCloseable {
         return new String(reply).equals("OK");
     }
 
-    // 3. Query (Uses Port 5556 via oneof envelope)
+    // query (Uses Port 5556 via oneof envelope)
     public LogEntry fetchById(int id) throws Exception {
         RegistaRequest request = RegistaRequest.newBuilder()
                 .setFetchId(id)
