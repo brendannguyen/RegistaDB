@@ -3,7 +3,7 @@ package com.registadb;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
-import registadb.Playbook.LogEntry;
+import registadb.Playbook.RegistaObject;
 import registadb.Playbook.RegistaRequest;
 
 public class RegistaClient implements AutoCloseable {
@@ -24,12 +24,12 @@ public class RegistaClient implements AutoCloseable {
     }
 
     // high-Speed Ingest (Uses Port 5555)
-    public void pushLog(LogEntry entry) {
+    public void pushLog(RegistaObject entry) {
         pushSocket.send(entry.toByteArray());
     }
 
     // verified Ingest (Uses Port 5556 via oneof envelope)
-    public boolean storeLogVerified(LogEntry entry) {
+    public boolean storeLogVerified(RegistaObject entry) {
         RegistaRequest request = RegistaRequest.newBuilder()
                 .setStoreRequest(entry)
                 .build();
@@ -39,7 +39,7 @@ public class RegistaClient implements AutoCloseable {
     }
 
     // query (Uses Port 5556 via oneof envelope)
-    public LogEntry fetchById(int id) throws Exception {
+    public RegistaObject fetchById(int id) throws Exception {
         RegistaRequest request = RegistaRequest.newBuilder()
                 .setFetchId(id)
                 .build();
@@ -51,7 +51,7 @@ public class RegistaClient implements AutoCloseable {
         if (status.equals("NOT_FOUND") || status.equals("UNKNOWN_CMD")) {
             return null;
         }
-        return LogEntry.parseFrom(reply);
+        return RegistaObject.parseFrom(reply);
     }
 
     // delete (Uses Port 5556 via oneof envelope)

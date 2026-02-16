@@ -46,11 +46,25 @@ void RegistaServer::Run() {
     std::cout << "Server loop stopped. Cleaning up sockets..." << std::endl;
 }
 
+void RegistaServer::PrepareEntry(registadb::RegistaObject& entry) {
+    // server-side timestamping
+    auto now = std::chrono::system_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+    entry.set_timestamp(ms);
+    
+    // id generation
+    if (entry.id() == 0) {
+        entry.set_id(storage_.GetNextId());
+    }
+}
+
 void RegistaServer::HandleIngest() {
     zmq::message_t msg;
     if (ingest_socket_.recv(msg, zmq::recv_flags::none)) {
-        registadb::LogEntry entry;
+        registadb::RegistaObject entry;
         if (entry.ParseFromArray(msg.data(), msg.size())) {
+
+            PrepareEntry(entry);
             storage_.StoreEntry(entry);
         }
     }
@@ -64,13 +78,18 @@ void RegistaServer::HandleQuery() {
 
         switch (envelope.payload_case()) {
             // ingest, send confirmation
-            case registadb::RegistaRequest::kStoreRequest:
-                storage_.StoreEntry(envelope.store_request());
+            case registadb::RegistaRequest::kStoreRequest: {
+                registadb::RegistaObject* store_req = envelope.mutable_store_request();
+
+                PrepareEntry(*store_req);
+                storage_.StoreEntry(*store_req);
                 query_socket_.send(zmq::buffer("OK"), zmq::send_flags::none);
                 break;
+            }
+
             // fetch entry
             case registadb::RegistaRequest::kFetchId: {
-                registadb::LogEntry result;
+                registadb::RegistaObject result;
                 if (storage_.GetEntryById(envelope.fetch_id(), &result)) {
                     std::string serialized;
                     result.SerializeToString(&serialized);
@@ -80,6 +99,7 @@ void RegistaServer::HandleQuery() {
                 }
                 break;
             }
+
             // delete entry
             case registadb::RegistaRequest::kDeleteId: {
                 if (storage_.DeleteEntryById(envelope.delete_id())) {

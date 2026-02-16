@@ -2,18 +2,33 @@ syntax = "proto3";
 
 package registadb;
 
-// This is the "Play" - the data packet Java sends to C++
-message LogEntry {
-    uint64 id = 1;
-    string category = 2; // e.g., "USER_ACTION", "SYSTEM_LOG"
-    string content = 3; // The actual data string
-    int64 timestamp = 4;
+message ListValue { repeated bytes elements = 1; }
+message MapValue  { map<string, bytes> fields = 1; }
+message RegistaObject {
+    enum Type {
+        STRING = 0;
+        LIST = 1;
+        HASH = 2;
+        JSON = 3;
+        VECTOR = 4;
+    }
+    Type type = 1;
+    uint64 id = 2;
+    int64 timestamp = 3;
+    map<string, string> metadata = 4;
+
+    oneof data {
+        bytes blob = 5;
+        ListValue list = 6;
+        MapValue hash = 7;
+    }
 }
+
 
 // universal envelope for RegistaDB
 message RegistaRequest {
     oneof payload {
-        LogEntry store_request = 1;
+        RegistaObject store_request = 1;
         int64 fetch_id = 2;
         int64 delete_id = 3;
         string status_check = 4;
