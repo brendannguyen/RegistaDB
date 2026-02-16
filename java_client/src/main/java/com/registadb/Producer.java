@@ -17,10 +17,7 @@ public class Producer {
             }
         }
 
-        try (ZContext context = new ZContext()) {
-            ZMQ.Socket socket = context.createSocket(ZMQ.PUSH);
-            socket.connect("tcp://localhost:5555"); // Connect to the C++ engine
-
+        try (RegistaClient client = new RegistaClient("localhost")) {
             System.out.println("Starting bulk upload of " + numEntries + " logs..." );
             long startTime = System.currentTimeMillis();
 
@@ -32,11 +29,14 @@ public class Producer {
                     .setTimestamp(System.currentTimeMillis() + i) // Offset to ensure unique keys
                     .build();
 
-                socket.send(entry.toByteArray());
+                client.pushLog(entry);
             }
 
             long endTime = System.currentTimeMillis();
             System.out.println("Finished! Sent " + numEntries + " messages in " + (endTime - startTime) + "ms");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 }

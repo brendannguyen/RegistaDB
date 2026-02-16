@@ -1,6 +1,13 @@
 registadb/Playbook$LogEntry.class
-registadb/Playbook.class
-com/registadb/Producer.class
-registadb/Playbook$LogEntryOrBuilder.class
+registadb/Playbook$RegistaRequest$Builder.class
+registadb/Playbook$RegistaRequest.class
+registadb/Playbook$RegistaRequest$PayloadCase.class
 registadb/Playbook$LogEntry$Builder.class
 registadb/Playbook$LogEntry$1.class
+com/registadb/TestRegistaClient.class
+registadb/Playbook.class
+com/registadb/RegistaClient.class
+registadb/Playbook$RegistaRequest$1.class
+com/registadb/Producer.class
+registadb/Playbook$LogEntryOrBuilder.class
+registadb/Playbook$RegistaRequestOrBuilder.class
