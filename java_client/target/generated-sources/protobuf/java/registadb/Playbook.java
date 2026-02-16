@@ -963,40 +963,39 @@ public final class Playbook {
     registadb.Playbook.LogEntryOrBuilder getStoreRequestOrBuilder();
 
     /**
-     * <code>int32 fetch_id = 2;</code>
+     * <code>int64 fetch_id = 2;</code>
      * @return Whether the fetchId field is set.
      */
     boolean hasFetchId();
     /**
-     * <code>int32 fetch_id = 2;</code>
+     * <code>int64 fetch_id = 2;</code>
      * @return The fetchId.
      */
-    int getFetchId();
+    long getFetchId();
 
     /**
-     * <pre>
-     * Example: "PING"
-     * </pre>
-     *
-     * <code>string status_check = 3;</code>
+     * <code>int64 delete_id = 3;</code>
+     * @return Whether the deleteId field is set.
+     */
+    boolean hasDeleteId();
+    /**
+     * <code>int64 delete_id = 3;</code>
+     * @return The deleteId.
+     */
+    long getDeleteId();
+
+    /**
+     * <code>string status_check = 4;</code>
      * @return Whether the statusCheck field is set.
      */
     boolean hasStatusCheck();
     /**
-     * <pre>
-     * Example: "PING"
-     * </pre>
-     *
-     * <code>string status_check = 3;</code>
+     * <code>string status_check = 4;</code>
      * @return The statusCheck.
      */
     java.lang.String getStatusCheck();
     /**
-     * <pre>
-     * Example: "PING"
-     * </pre>
-     *
-     * <code>string status_check = 3;</code>
+     * <code>string status_check = 4;</code>
      * @return The bytes for statusCheck.
      */
     com.google.protobuf.ByteString
@@ -1055,7 +1054,8 @@ public final class Playbook {
             com.google.protobuf.AbstractMessage.InternalOneOfEnum {
       STORE_REQUEST(1),
       FETCH_ID(2),
-      STATUS_CHECK(3),
+      DELETE_ID(3),
+      STATUS_CHECK(4),
       PAYLOAD_NOT_SET(0);
       private final int value;
       private PayloadCase(int value) {
@@ -1075,7 +1075,8 @@ public final class Playbook {
         switch (value) {
           case 1: return STORE_REQUEST;
           case 2: return FETCH_ID;
-          case 3: return STATUS_CHECK;
+          case 3: return DELETE_ID;
+          case 4: return STATUS_CHECK;
           case 0: return PAYLOAD_NOT_SET;
           default: return null;
         }
@@ -1124,7 +1125,7 @@ public final class Playbook {
 
     public static final int FETCH_ID_FIELD_NUMBER = 2;
     /**
-     * <code>int32 fetch_id = 2;</code>
+     * <code>int64 fetch_id = 2;</code>
      * @return Whether the fetchId field is set.
      */
     @java.lang.Override
@@ -1132,40 +1133,53 @@ public final class Playbook {
       return payloadCase_ == 2;
     }
     /**
-     * <code>int32 fetch_id = 2;</code>
+     * <code>int64 fetch_id = 2;</code>
      * @return The fetchId.
      */
     @java.lang.Override
-    public int getFetchId() {
+    public long getFetchId() {
       if (payloadCase_ == 2) {
-        return (java.lang.Integer) payload_;
+        return (java.lang.Long) payload_;
       }
-      return 0;
+      return 0L;
     }
 
-    public static final int STATUS_CHECK_FIELD_NUMBER = 3;
+    public static final int DELETE_ID_FIELD_NUMBER = 3;
     /**
-     * <pre>
-     * Example: "PING"
-     * </pre>
-     *
-     * <code>string status_check = 3;</code>
-     * @return Whether the statusCheck field is set.
+     * <code>int64 delete_id = 3;</code>
+     * @return Whether the deleteId field is set.
      */
-    public boolean hasStatusCheck() {
+    @java.lang.Override
+    public boolean hasDeleteId() {
       return payloadCase_ == 3;
     }
     /**
-     * <pre>
-     * Example: "PING"
-     * </pre>
-     *
-     * <code>string status_check = 3;</code>
+     * <code>int64 delete_id = 3;</code>
+     * @return The deleteId.
+     */
+    @java.lang.Override
+    public long getDeleteId() {
+      if (payloadCase_ == 3) {
+        return (java.lang.Long) payload_;
+      }
+      return 0L;
+    }
+
+    public static final int STATUS_CHECK_FIELD_NUMBER = 4;
+    /**
+     * <code>string status_check = 4;</code>
+     * @return Whether the statusCheck field is set.
+     */
+    public boolean hasStatusCheck() {
+      return payloadCase_ == 4;
+    }
+    /**
+     * <code>string status_check = 4;</code>
      * @return The statusCheck.
      */
     public java.lang.String getStatusCheck() {
       java.lang.Object ref = "";
-      if (payloadCase_ == 3) {
+      if (payloadCase_ == 4) {
         ref = payload_;
       }
       if (ref instanceof java.lang.String) {
@@ -1174,31 +1188,27 @@ public final class Playbook {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        if (payloadCase_ == 3) {
+        if (payloadCase_ == 4) {
           payload_ = s;
         }
         return s;
       }
     }
     /**
-     * <pre>
-     * Example: "PING"
-     * </pre>
-     *
-     * <code>string status_check = 3;</code>
+     * <code>string status_check = 4;</code>
      * @return The bytes for statusCheck.
      */
     public com.google.protobuf.ByteString
         getStatusCheckBytes() {
       java.lang.Object ref = "";
-      if (payloadCase_ == 3) {
+      if (payloadCase_ == 4) {
         ref = payload_;
       }
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        if (payloadCase_ == 3) {
+        if (payloadCase_ == 4) {
           payload_ = b;
         }
         return b;
@@ -1225,11 +1235,15 @@ public final class Playbook {
         output.writeMessage(1, (registadb.Playbook.LogEntry) payload_);
       }
       if (payloadCase_ == 2) {
-        output.writeInt32(
-            2, (int)((java.lang.Integer) payload_));
+        output.writeInt64(
+            2, (long)((java.lang.Long) payload_));
       }
       if (payloadCase_ == 3) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, payload_);
+        output.writeInt64(
+            3, (long)((java.lang.Long) payload_));
+      }
+      if (payloadCase_ == 4) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, payload_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1246,11 +1260,16 @@ public final class Playbook {
       }
       if (payloadCase_ == 2) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(
-              2, (int)((java.lang.Integer) payload_));
+          .computeInt64Size(
+              2, (long)((java.lang.Long) payload_));
       }
       if (payloadCase_ == 3) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, payload_);
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(
+              3, (long)((java.lang.Long) payload_));
+      }
+      if (payloadCase_ == 4) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, payload_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -1278,6 +1297,10 @@ public final class Playbook {
               != other.getFetchId()) return false;
           break;
         case 3:
+          if (getDeleteId()
+              != other.getDeleteId()) return false;
+          break;
+        case 4:
           if (!getStatusCheck()
               .equals(other.getStatusCheck())) return false;
           break;
@@ -1302,9 +1325,15 @@ public final class Playbook {
           break;
         case 2:
           hash = (37 * hash) + FETCH_ID_FIELD_NUMBER;
-          hash = (53 * hash) + getFetchId();
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getFetchId());
           break;
         case 3:
+          hash = (37 * hash) + DELETE_ID_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getDeleteId());
+          break;
+        case 4:
           hash = (37 * hash) + STATUS_CHECK_FIELD_NUMBER;
           hash = (53 * hash) + getStatusCheck().hashCode();
           break;
@@ -1547,8 +1576,12 @@ public final class Playbook {
             setFetchId(other.getFetchId());
             break;
           }
+          case DELETE_ID: {
+            setDeleteId(other.getDeleteId());
+            break;
+          }
           case STATUS_CHECK: {
-            payloadCase_ = 3;
+            payloadCase_ = 4;
             payload_ = other.payload_;
             onChanged();
             break;
@@ -1591,16 +1624,21 @@ public final class Playbook {
                 break;
               } // case 10
               case 16: {
-                payload_ = input.readInt32();
+                payload_ = input.readInt64();
                 payloadCase_ = 2;
                 break;
               } // case 16
-              case 26: {
-                java.lang.String s = input.readStringRequireUtf8();
+              case 24: {
+                payload_ = input.readInt64();
                 payloadCase_ = 3;
+                break;
+              } // case 24
+              case 34: {
+                java.lang.String s = input.readStringRequireUtf8();
+                payloadCase_ = 4;
                 payload_ = s;
                 break;
-              } // case 26
+              } // case 34
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1776,28 +1814,28 @@ public final class Playbook {
       }
 
       /**
-       * <code>int32 fetch_id = 2;</code>
+       * <code>int64 fetch_id = 2;</code>
        * @return Whether the fetchId field is set.
        */
       public boolean hasFetchId() {
         return payloadCase_ == 2;
       }
       /**
-       * <code>int32 fetch_id = 2;</code>
+       * <code>int64 fetch_id = 2;</code>
        * @return The fetchId.
        */
-      public int getFetchId() {
+      public long getFetchId() {
         if (payloadCase_ == 2) {
-          return (java.lang.Integer) payload_;
+          return (java.lang.Long) payload_;
         }
-        return 0;
+        return 0L;
       }
       /**
-       * <code>int32 fetch_id = 2;</code>
+       * <code>int64 fetch_id = 2;</code>
        * @param value The fetchId to set.
        * @return This builder for chaining.
        */
-      public Builder setFetchId(int value) {
+      public Builder setFetchId(long value) {
         
         payloadCase_ = 2;
         payload_ = value;
@@ -1805,7 +1843,7 @@ public final class Playbook {
         return this;
       }
       /**
-       * <code>int32 fetch_id = 2;</code>
+       * <code>int64 fetch_id = 2;</code>
        * @return This builder for chaining.
        */
       public Builder clearFetchId() {
@@ -1818,36 +1856,70 @@ public final class Playbook {
       }
 
       /**
-       * <pre>
-       * Example: "PING"
-       * </pre>
-       *
-       * <code>string status_check = 3;</code>
+       * <code>int64 delete_id = 3;</code>
+       * @return Whether the deleteId field is set.
+       */
+      public boolean hasDeleteId() {
+        return payloadCase_ == 3;
+      }
+      /**
+       * <code>int64 delete_id = 3;</code>
+       * @return The deleteId.
+       */
+      public long getDeleteId() {
+        if (payloadCase_ == 3) {
+          return (java.lang.Long) payload_;
+        }
+        return 0L;
+      }
+      /**
+       * <code>int64 delete_id = 3;</code>
+       * @param value The deleteId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDeleteId(long value) {
+        
+        payloadCase_ = 3;
+        payload_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 delete_id = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearDeleteId() {
+        if (payloadCase_ == 3) {
+          payloadCase_ = 0;
+          payload_ = null;
+          onChanged();
+        }
+        return this;
+      }
+
+      /**
+       * <code>string status_check = 4;</code>
        * @return Whether the statusCheck field is set.
        */
       @java.lang.Override
       public boolean hasStatusCheck() {
-        return payloadCase_ == 3;
+        return payloadCase_ == 4;
       }
       /**
-       * <pre>
-       * Example: "PING"
-       * </pre>
-       *
-       * <code>string status_check = 3;</code>
+       * <code>string status_check = 4;</code>
        * @return The statusCheck.
        */
       @java.lang.Override
       public java.lang.String getStatusCheck() {
         java.lang.Object ref = "";
-        if (payloadCase_ == 3) {
+        if (payloadCase_ == 4) {
           ref = payload_;
         }
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          if (payloadCase_ == 3) {
+          if (payloadCase_ == 4) {
             payload_ = s;
           }
           return s;
@@ -1856,25 +1928,21 @@ public final class Playbook {
         }
       }
       /**
-       * <pre>
-       * Example: "PING"
-       * </pre>
-       *
-       * <code>string status_check = 3;</code>
+       * <code>string status_check = 4;</code>
        * @return The bytes for statusCheck.
        */
       @java.lang.Override
       public com.google.protobuf.ByteString
           getStatusCheckBytes() {
         java.lang.Object ref = "";
-        if (payloadCase_ == 3) {
+        if (payloadCase_ == 4) {
           ref = payload_;
         }
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          if (payloadCase_ == 3) {
+          if (payloadCase_ == 4) {
             payload_ = b;
           }
           return b;
@@ -1883,32 +1951,24 @@ public final class Playbook {
         }
       }
       /**
-       * <pre>
-       * Example: "PING"
-       * </pre>
-       *
-       * <code>string status_check = 3;</code>
+       * <code>string status_check = 4;</code>
        * @param value The statusCheck to set.
        * @return This builder for chaining.
        */
       public Builder setStatusCheck(
           java.lang.String value) {
         if (value == null) { throw new NullPointerException(); }
-        payloadCase_ = 3;
+        payloadCase_ = 4;
         payload_ = value;
         onChanged();
         return this;
       }
       /**
-       * <pre>
-       * Example: "PING"
-       * </pre>
-       *
-       * <code>string status_check = 3;</code>
+       * <code>string status_check = 4;</code>
        * @return This builder for chaining.
        */
       public Builder clearStatusCheck() {
-        if (payloadCase_ == 3) {
+        if (payloadCase_ == 4) {
           payloadCase_ = 0;
           payload_ = null;
           onChanged();
@@ -1916,11 +1976,7 @@ public final class Playbook {
         return this;
       }
       /**
-       * <pre>
-       * Example: "PING"
-       * </pre>
-       *
-       * <code>string status_check = 3;</code>
+       * <code>string status_check = 4;</code>
        * @param value The bytes for statusCheck to set.
        * @return This builder for chaining.
        */
@@ -1928,7 +1984,7 @@ public final class Playbook {
           com.google.protobuf.ByteString value) {
         if (value == null) { throw new NullPointerException(); }
         checkByteStringIsUtf8(value);
-        payloadCase_ = 3;
+        payloadCase_ = 4;
         payload_ = value;
         onChanged();
         return this;
@@ -2018,10 +2074,11 @@ public final class Playbook {
     java.lang.String[] descriptorData = {
       "\n\016playbook.proto\022\tregistadb\"L\n\010LogEntry\022" +
       "\n\n\002id\030\001 \001(\004\022\020\n\010category\030\002 \001(\t\022\017\n\007content" +
-      "\030\003 \001(\t\022\021\n\ttimestamp\030\004 \001(\003\"u\n\016RegistaRequ" +
-      "est\022,\n\rstore_request\030\001 \001(\0132\023.registadb.L" +
-      "ogEntryH\000\022\022\n\010fetch_id\030\002 \001(\005H\000\022\026\n\014status_" +
-      "check\030\003 \001(\tH\000B\t\n\007payloadb\006proto3"
+      "\030\003 \001(\t\022\021\n\ttimestamp\030\004 \001(\003\"\212\001\n\016RegistaReq" +
+      "uest\022,\n\rstore_request\030\001 \001(\0132\023.registadb." +
+      "LogEntryH\000\022\022\n\010fetch_id\030\002 \001(\003H\000\022\023\n\tdelete" +
+      "_id\030\003 \001(\003H\000\022\026\n\014status_check\030\004 \001(\tH\000B\t\n\007p" +
+      "ayloadb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -2038,7 +2095,7 @@ public final class Playbook {
     internal_static_registadb_RegistaRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_registadb_RegistaRequest_descriptor,
-        new java.lang.String[] { "StoreRequest", "FetchId", "StatusCheck", "Payload", });
+        new java.lang.String[] { "StoreRequest", "FetchId", "DeleteId", "StatusCheck", "Payload", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

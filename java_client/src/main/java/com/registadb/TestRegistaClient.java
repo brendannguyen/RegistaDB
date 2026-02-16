@@ -31,6 +31,17 @@ public class TestRegistaClient {
             } else {
                 System.out.println("Log not found yet.");
             }
+
+            // delete from smart line
+            boolean status = client.deleteById(testId);
+            if (status) {
+                System.out.println(status);
+                System.out.println("Success! Deleted (tombstoned): " + testId);
+            } else {
+                System.out.println(status);
+                System.out.println("Log not found/deleted.");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

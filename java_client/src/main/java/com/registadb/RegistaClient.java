@@ -35,7 +35,7 @@ public class RegistaClient implements AutoCloseable {
                 .build();
         reqSocket.send(request.toByteArray());
         byte[] reply = reqSocket.recv(0);
-        return new String(reply).equals("OK");
+        return new String(reply).trim().equals("OK");
     }
 
     // query (Uses Port 5556 via oneof envelope)
@@ -46,12 +46,24 @@ public class RegistaClient implements AutoCloseable {
         reqSocket.send(request.toByteArray());
         
         byte[] reply = reqSocket.recv(0);
-        String status = new String(reply);
+        String status = new String(reply).trim();
         
         if (status.equals("NOT_FOUND") || status.equals("UNKNOWN_CMD")) {
             return null;
         }
         return LogEntry.parseFrom(reply);
+    }
+
+    // delete (Uses Port 5556 via oneof envelope)
+    public boolean deleteById(int id) throws Exception {
+        RegistaRequest request = RegistaRequest.newBuilder()
+                .setDeleteId(id)
+                .build();
+        reqSocket.send(request.toByteArray());
+        
+        byte[] reply = reqSocket.recv(0);
+        String status = new String(reply).trim();
+        return status.equals("OK");
     }
 
     @Override

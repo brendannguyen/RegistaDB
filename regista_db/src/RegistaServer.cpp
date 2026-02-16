@@ -80,6 +80,15 @@ void RegistaServer::HandleQuery() {
                 }
                 break;
             }
+            // delete entry
+            case registadb::RegistaRequest::kDeleteId: {
+                if (storage_.DeleteEntryById(envelope.delete_id())) {
+                    query_socket_.send(zmq::buffer("OK"), zmq::send_flags::none);
+                } else {
+                    query_socket_.send(zmq::buffer("NOT_FOUND"), zmq::send_flags::none);
+                }
+                break;
+            }
 
             default:
                 query_socket_.send(zmq::buffer("UNKNOWN_CMD"), zmq::send_flags::none);

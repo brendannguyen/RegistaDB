@@ -14,7 +14,8 @@ message LogEntry {
 message RegistaRequest {
     oneof payload {
         LogEntry store_request = 1;
-        int32 fetch_id = 2;
-        string status_check = 3; // Example: "PING"
+        int64 fetch_id = 2;
+        int64 delete_id = 3;
+        string status_check = 4;
     }
 }
