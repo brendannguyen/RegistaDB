@@ -1,6 +1,16 @@
 # RegistaDB
-A high-performance C++ middleware engine using RocksDB to orchestrate data ingestion streams from Java applications.
+<img width="150" height="150" alt="registaDB logo" src="https://github.com/user-attachments/assets/5e3c8d1b-c3a1-414e-bc03-6bddf0ecc30c" />
 
+A high-performance C++ middleware engine using RocksDB to orchestrate data ingestion streams from applications.
+
+## Features
+
+- Uses RocksDB for database storage on SSD.
+- Create, Read, Delete
+- Index and data column families using reversed big-endian keys (16-byte primary composite key, 8-byte index key)
+- Two tunnels: performance & smart (PUSH/PULL & REQ/REP)
+- Smart tunnel for verified ingest, read and delete
+- Performance tunnel for non verified ingest
 
 ## Guide
 
@@ -76,7 +86,7 @@ cd regista_db/build
 make && ./registadb_engine
 ```
 
-### Client changes (java)
+#### Client changes (java)
 
 1. Compile
 
@@ -89,4 +99,19 @@ mvn compile
 
 ```
 mvn exec:java -Dexec.mainClass="com.registadb.Producer"
+```
+
+#### Run tests (C++)
+
+1. Compile (if not already)
+
+```
+cd regista_db/build
+make
+```
+
+2. Run tests
+
+```
+./regista_tests
 ```

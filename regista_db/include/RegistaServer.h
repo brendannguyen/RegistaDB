@@ -6,6 +6,10 @@
 #include "StorageManager.h"
 #include "playbook.pb.h"
 
+/**
+ * @brief Manages the main server loop, handling both ingest and query sockets, and orchestrating interactions with StorageManager.
+ * 
+ */
 class RegistaServer {
 public:
     RegistaServer(StorageManager& storage, int ingest_port, int query_port);
@@ -21,6 +25,9 @@ private:
 
     void HandleIngest();
     void HandleQuery();
+
+protected:
+    registadb::StatusCode PrepareEntry(registadb::RegistaObject& entry);
 };
 
 #endif

@@ -6,6 +6,11 @@
 
 std::atomic<bool> keep_running(true);
 
+/**
+ * @brief Handles system signals (e.g., SIGINT) to gracefully shut down the server.
+ * 
+ * @param signal The received signal number.
+ */
 void signal_handler(int signal) {
     if (signal == SIGINT) {
         std::cout << "\n[Signal] Interrupt received. Shutting down gracefully..." << std::endl;
@@ -13,6 +18,11 @@ void signal_handler(int signal) {
     }
 }
 
+/**
+ * @brief Main entry point for the RegistaDB server application.
+ * 
+ * @return int Exit status code.
+ */
 int main() {
     std::signal(SIGINT, signal_handler);
     StorageManager storage("../../data/registadb_store");
