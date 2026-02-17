@@ -1,4 +1,6 @@
 # RegistaDB
+<img width="150" height="150" alt="registaDB logo" src="https://github.com/user-attachments/assets/5e3c8d1b-c3a1-414e-bc03-6bddf0ecc30c" />
+
 A high-performance C++ middleware engine using RocksDB to orchestrate data ingestion streams from applications.
 
 ## Features
