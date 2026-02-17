@@ -1,7 +1,7 @@
 # RegistaDB
 <img width="150" height="150" alt="registaDB logo" src="https://github.com/user-attachments/assets/5e3c8d1b-c3a1-414e-bc03-6bddf0ecc30c" />
 
-A high-performance C++ middleware engine using RocksDB to orchestrate data ingestion streams from applications.
+A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data ingestion streams from applications.
 
 ## Features
 
@@ -11,6 +11,17 @@ A high-performance C++ middleware engine using RocksDB to orchestrate data inges
 - Two tunnels: performance & smart (PUSH/PULL & REQ/REP)
 - Smart tunnel for verified ingest, read and delete
 - Performance tunnel for non verified ingest
+
+### Proposed Features
+
+- docker-compose deployment
+- Update functionality (delta update)
+- Dashboard (Grafana + Prometheus) + control panel
+- RAM optimised mode
+- Batching mode
+- REST support
+- Scalability support
+- Small app/backend example
 
 ## Guide
 
