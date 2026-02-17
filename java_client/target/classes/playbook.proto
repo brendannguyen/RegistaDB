@@ -3,7 +3,7 @@ syntax = "proto3";
 package registadb;
 
 /**
- * @brief Protobuf definitions for RegistaObject, which represents the core data structure stored in RegistaDB
+ * @brief Protobuf definitions for RegistaObject, which represents the core data structure stored in RegistaDB.
  * 
  */
 message ListValue { repeated bytes elements = 1; }

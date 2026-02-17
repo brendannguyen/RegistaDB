@@ -1,6 +1,14 @@
 # RegistaDB
-A high-performance C++ middleware engine using RocksDB to orchestrate data ingestion streams from Java applications.
+A high-performance C++ middleware engine using RocksDB to orchestrate data ingestion streams from applications.
 
+## Features
+
+- Uses RocksDB for database storage on SSD.
+- Create, Read, Delete
+- Index and data column families using reversed big-endian keys (16-byte primary composite key, 8-byte index key)
+- Two tunnels: performance & smart (PUSH/PULL & REQ/REP)
+- Smart tunnel for verified ingest, read and delete
+- Performance tunnel for non verified ingest
 
 ## Guide
 
