@@ -7,6 +7,10 @@
 #include "playbook.pb.h"
 
 
+/**
+ * @brief Manages all interactions with RocksDB, including storing, retrieving, and deleting entries. Implements a composite key structure for efficient time-based retrieval and an index for ID-based lookups.
+ * 
+ */
 class StorageManager {
 public:
     StorageManager(const std::string& db_path);
@@ -35,9 +39,6 @@ public:
     void SetStartingId(uint64_t id) {
         global_id_counter_.store(id);
     }
-
-
-
 private:
     rocksdb::DB* db;
     rocksdb::Options options;

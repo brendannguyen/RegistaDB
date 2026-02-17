@@ -4,6 +4,13 @@
 
 extern std::atomic<bool> keep_running;
 
+/**
+ * @brief Construct a new Regista Server:: Regista Server object
+ * 
+ * @param storage StorageManager instance to use for data operations
+ * @param ingest_p Ingest port number for receiving data
+ * @param query_p Query port number for handling requests
+ */
 RegistaServer::RegistaServer(StorageManager& storage, int ingest_p, int query_p)
     : storage_(storage), 
       context_(1),
@@ -15,6 +22,10 @@ RegistaServer::RegistaServer(StorageManager& storage, int ingest_p, int query_p)
     query_socket_.bind("tcp://*:" + std::to_string(query_p));
 }
 
+/**
+ * @brief Runs the main server loop, handling both ingest and query requests.
+ * 
+ */
 void RegistaServer::Run() {
     // setup polling items
     zmq::pollitem_t items[] = {
@@ -46,6 +57,12 @@ void RegistaServer::Run() {
     std::cout << "Server loop stopped. Cleaning up sockets..." << std::endl;
 }
 
+/**
+ * @brief Prepares a RegistaObject for storage by setting timestamp and generating an ID if not present.
+ * 
+ * @param entry The RegistaObject to prepare.
+ * @return registadb::StatusCode The status of the preparation operation.
+ */
 registadb::StatusCode RegistaServer::PrepareEntry(registadb::RegistaObject& entry) {
     // server-side timestamping
     auto now = std::chrono::system_clock::now();
@@ -85,6 +102,10 @@ registadb::StatusCode RegistaServer::PrepareEntry(registadb::RegistaObject& entr
     return registadb::StatusCode::SUCCESS;
 }
 
+/**
+ * @brief Handles incoming data on the ingest socket, prepares it, and stores it using StorageManager.
+ * 
+ */
 void RegistaServer::HandleIngest() {
     zmq::message_t msg;
     if (ingest_socket_.recv(msg, zmq::recv_flags::none)) {
@@ -99,6 +120,10 @@ void RegistaServer::HandleIngest() {
     }
 }
 
+/**
+ * @brief Handles incoming requests on the query socket, processes them, and sends appropriate responses back to the client.
+ * 
+ */
 void RegistaServer::HandleQuery() {
     zmq::message_t msg;
     if (query_socket_.recv(msg, zmq::recv_flags::none)) {

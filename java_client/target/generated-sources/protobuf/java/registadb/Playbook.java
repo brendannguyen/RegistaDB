@@ -15,6 +15,12 @@ public final class Playbook {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   /**
+   * <pre>
+   **
+   * &#64;brief Status codes for RegistaDB operations, used in responses to indicate success or specific error conditions.
+   * 
+   * </pre>
+   *
    * Protobuf enum {@code registadb.StatusCode}
    */
   public enum StatusCode
@@ -171,6 +177,12 @@ public final class Playbook {
     com.google.protobuf.ByteString getElements(int index);
   }
   /**
+   * <pre>
+   **
+   * &#64;brief Protobuf definitions for RegistaObject, which represents the core data structure stored in RegistaDB.
+   * 
+   * </pre>
+   *
    * Protobuf type {@code registadb.ListValue}
    */
   public static final class ListValue extends
@@ -402,6 +414,12 @@ public final class Playbook {
       return builder;
     }
     /**
+     * <pre>
+     **
+     * &#64;brief Protobuf definitions for RegistaObject, which represents the core data structure stored in RegistaDB.
+     * 
+     * </pre>
+     *
      * Protobuf type {@code registadb.ListValue}
      */
     public static final class Builder extends
@@ -3239,7 +3257,9 @@ java.lang.String defaultValue) {
   }
   /**
    * <pre>
-   * universal envelope for RegistaDB
+   **
+   * &#64;brief Universal envelope for RegistaDB requests, allowing for different types of operations (store, fetch, delete, status check) to be represented in a single message format.
+   * 
    * </pre>
    *
    * Protobuf type {@code registadb.RegistaRequest}
@@ -3671,7 +3691,9 @@ java.lang.String defaultValue) {
     }
     /**
      * <pre>
-     * universal envelope for RegistaDB
+     **
+     * &#64;brief Universal envelope for RegistaDB requests, allowing for different types of operations (store, fetch, delete, status check) to be represented in a single message format.
+     * 
      * </pre>
      *
      * Protobuf type {@code registadb.RegistaRequest}

@@ -6,6 +6,7 @@ import registadb.Playbook.StatusCode;
 
 import com.google.protobuf.ByteString;
 
+
 public class TestRegistaClient {
     public static void main(String[] args) {
         try (RegistaClient client = new RegistaClient("localhost")) {

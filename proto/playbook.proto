@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package registadb;
 
+/**
+ * @brief Protobuf definitions for RegistaObject, which represents the core data structure stored in RegistaDB.
+ * 
+ */
 message ListValue { repeated bytes elements = 1; }
 message MapValue  { map<string, bytes> fields = 1; }
 message RegistaObject {
@@ -24,7 +28,10 @@ message RegistaObject {
     }
 }
 
-// universal envelope for RegistaDB
+/**
+ * @brief Universal envelope for RegistaDB requests, allowing for different types of operations (store, fetch, delete, status check) to be represented in a single message format.
+ * 
+ */
 message RegistaRequest {
     oneof payload {
         RegistaObject store_request = 1;
@@ -34,6 +41,10 @@ message RegistaRequest {
     }
 }
 
+/**
+ * @brief Status codes for RegistaDB operations, used in responses to indicate success or specific error conditions.
+ * 
+ */
 enum StatusCode {
     SUCCESS = 0;
     ERR_TYPE_MISMATCH = 1;

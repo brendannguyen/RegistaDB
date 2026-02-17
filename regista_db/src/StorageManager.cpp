@@ -4,7 +4,11 @@
 #include <arpa/inet.h>
 
 
-
+/**
+ * @brief Construct a new Storage Manager:: Storage Manager object
+ * 
+ * @param db_path The path to the RocksDB database directory
+ */
 StorageManager::StorageManager(const std::string& db_path) {
     options.create_if_missing = true;
     options.create_missing_column_families = true;
@@ -40,6 +44,10 @@ StorageManager::StorageManager(const std::string& db_path) {
 
 }
 
+/**
+ * @brief Destroy the Storage Manager:: Storage Manager object
+ * 
+ */
 StorageManager::~StorageManager() {
     db->DestroyColumnFamilyHandle(index_handle_);
     db->DestroyColumnFamilyHandle(data_handle_);
@@ -47,6 +55,13 @@ StorageManager::~StorageManager() {
     delete db;
 }
 
+/**
+ * @brief Encodes a composite key using timestamp and ID, with reversed timestamp for reverse sorting in RocksDB.
+ * 
+ * @param timestamp The timestamp to encode in the key.
+ * @param id The ID to encode in the key.
+ * @return std::string The encoded composite key.
+ */
 std::string StorageManager::EncodeCompositeKey(uint64_t timestamp, uint64_t id) {
     uint64_t reversed_timestamp = UINT64_MAX - timestamp; // subtract from max to appear at beginning
 
@@ -61,6 +76,12 @@ std::string StorageManager::EncodeCompositeKey(uint64_t timestamp, uint64_t id) 
     return std::string(buf, 16);
 }
 
+/**
+ * @brief Encodes an index key using the given ID, with reversed ID for reverse sorting in RocksDB.
+ * 
+ * @param id The ID to encode in the key.
+ * @return std::string The encoded index key.
+ */
 std::string StorageManager::EncodeIndexKey(uint64_t id) {
     uint64_t reversed_id = UINT64_MAX - id; // subtract from max to appear at beginning
 
@@ -73,6 +94,12 @@ std::string StorageManager::EncodeIndexKey(uint64_t id) {
     return std::string(buf, 8);
 }
 
+/**
+ * @brief Decodes a composite key back into its original timestamp and ID components.
+ * 
+ * @param key The composite key to decode, expected to be 16 bytes long.
+ * @return std::pair<uint64_t, uint64_t> The decoded timestamp and ID as a pair.
+ */
 std::pair<uint64_t, uint64_t> StorageManager::DecodeCompositeKey(const char* key) {
     uint64_t be_ts, be_id;
     std::memcpy(&be_ts, key, 8);
@@ -84,6 +111,12 @@ std::pair<uint64_t, uint64_t> StorageManager::DecodeCompositeKey(const char* key
     };
 }
 
+/**
+ * @brief Decodes an index key back into its original ID component.
+ * 
+ * @param key The index key to decode, expected to be 8 bytes long.
+ * @return uint64_t The decoded ID.
+ */
 uint64_t StorageManager::DecodeIndexKey(const char* key) {
 
     uint64_t value;
@@ -93,7 +126,13 @@ uint64_t StorageManager::DecodeIndexKey(const char* key) {
     return (UINT64_MAX - value);
 }
 
-
+/**
+ * @brief Stores a RegistaObject entry in RocksDB by writing to both the index and data column families atomically using a WriteBatch.
+ * 
+ * @param entry The RegistaObject to store, which should already be prepared (timestamp set, ID generated if needed).
+ * @return true: The entry was successfully stored in RocksDB.
+ * @return false: There was an error writing the entry to RocksDB.
+ */
 bool StorageManager::StoreEntry(const registadb::RegistaObject& entry) {
     // prepare keys
     uint64_t entry_timestamp = static_cast<uint64_t>(entry.timestamp());
@@ -116,6 +155,14 @@ bool StorageManager::StoreEntry(const registadb::RegistaObject& entry) {
     return s.ok();
 }
 
+/**
+ * @brief Gets a RegistaObject entry from RocksDB by looking up the ID in the index column family to find the primary key, then retrieving the actual data from the data column family.
+ * 
+ * @param id The ID of the entry to retrieve.
+ * @param out_entry The RegistaObject to populate with the retrieved data.
+ * @return true: The entry was successfully retrieved.
+ * @return false: There was an error retrieving the entry.
+ */
 bool StorageManager::GetEntryById(int64_t id, registadb::RegistaObject* out_entry) {
     uint64_t entry_id = static_cast<uint64_t>(id);
     std::string index_key = EncodeIndexKey(entry_id);
@@ -135,6 +182,13 @@ bool StorageManager::GetEntryById(int64_t id, registadb::RegistaObject* out_entr
     return false;
 }
 
+/**
+ * @brief Deletes (tombstones) a RegistaObject entry from RocksDB by looking up the ID in the index column family to find the primary key, then deleting both the index and data entries atomically using a WriteBatch.
+ * 
+ * @param id The ID of the entry to delete.
+ * @return true: The entry was successfully deleted.
+ * @return false: There was an error deleting the entry.
+ */
 bool StorageManager::DeleteEntryById(int64_t id) {
     uint64_t entry_id = static_cast<uint64_t>(id);
     std::string index_key = EncodeIndexKey(entry_id);
