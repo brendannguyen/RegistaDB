@@ -36,6 +36,8 @@ public:
         global_id_counter_.store(id);
     }
 
+
+
 private:
     rocksdb::DB* db;
     rocksdb::Options options;
@@ -44,6 +46,14 @@ private:
     rocksdb::ColumnFamilyHandle* default_handle_ = nullptr;
 
     std::atomic<uint64_t> global_id_counter_{1};
+
+protected:
+    rocksdb::Iterator* GetRawIndexIterator() {
+        return db->NewIterator(rocksdb::ReadOptions(), index_handle_);
+    }
+    rocksdb::Iterator* GetRawDataIterator() {
+        return db->NewIterator(rocksdb::ReadOptions(), data_handle_);
+    }
 };
 
 #endif
