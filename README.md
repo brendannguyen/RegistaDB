@@ -76,7 +76,7 @@ cd regista_db/build
 make && ./registadb_engine
 ```
 
-### Client changes (java)
+#### Client changes (java)
 
 1. Compile
 
@@ -89,4 +89,19 @@ mvn compile
 
 ```
 mvn exec:java -Dexec.mainClass="com.registadb.Producer"
+```
+
+#### Run tests (C++)
+
+1. Compile (if not already)
+
+```
+cd regista_db/build
+make
+```
+
+2. Run tests
+
+```
+./regista_tests
 ```
