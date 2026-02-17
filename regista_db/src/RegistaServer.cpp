@@ -46,7 +46,7 @@ void RegistaServer::Run() {
     std::cout << "Server loop stopped. Cleaning up sockets..." << std::endl;
 }
 
-void RegistaServer::PrepareEntry(registadb::RegistaObject& entry) {
+registadb::StatusCode RegistaServer::PrepareEntry(registadb::RegistaObject& entry) {
     // server-side timestamping
     auto now = std::chrono::system_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
@@ -56,6 +56,33 @@ void RegistaServer::PrepareEntry(registadb::RegistaObject& entry) {
     if (entry.id() == 0) {
         entry.set_id(storage_.GetNextId());
     }
+
+    // type validation
+    switch (entry.type()) {
+        // binary/text data
+        case registadb::RegistaObject::STRING:
+        case registadb::RegistaObject::JSON:
+            if (entry.data_case() != registadb::RegistaObject::kBlob) {
+                return registadb::StatusCode::ERR_TYPE_MISMATCH;
+            }
+            break;
+        // sequential data
+        case registadb::RegistaObject::LIST:
+        case registadb::RegistaObject::VECTOR:
+            if (entry.data_case() != registadb::RegistaObject::kList) {
+                return registadb::StatusCode::ERR_TYPE_MISMATCH;
+            }
+            break;
+        case registadb::RegistaObject::HASH:
+            if (entry.data_case() != registadb::RegistaObject::kHash) {
+                return registadb::StatusCode::ERR_TYPE_MISMATCH;
+            }
+            break;
+        default:
+            return registadb::StatusCode::ERR_UNKNOWN_TYPE;
+    }
+
+    return registadb::StatusCode::SUCCESS;
 }
 
 void RegistaServer::HandleIngest() {
@@ -64,8 +91,10 @@ void RegistaServer::HandleIngest() {
         registadb::RegistaObject entry;
         if (entry.ParseFromArray(msg.data(), msg.size())) {
 
-            PrepareEntry(entry);
-            storage_.StoreEntry(entry);
+            registadb::StatusCode status = PrepareEntry(entry);
+            if (status == registadb::StatusCode::SUCCESS) {
+                storage_.StoreEntry(entry);
+            }
         }
     }
 }
@@ -81,10 +110,15 @@ void RegistaServer::HandleQuery() {
             case registadb::RegistaRequest::kStoreRequest: {
                 registadb::RegistaObject* store_req = envelope.mutable_store_request();
 
-                PrepareEntry(*store_req);
-                storage_.StoreEntry(*store_req);
-                query_socket_.send(zmq::buffer("OK"), zmq::send_flags::none);
-                break;
+                registadb::StatusCode status = PrepareEntry(*store_req);
+                if (status == registadb::StatusCode::SUCCESS) {
+                    storage_.StoreEntry(*store_req);
+                    query_socket_.send(zmq::buffer("OK"), zmq::send_flags::none);
+                    break;
+                } else {
+                    query_socket_.send(zmq::buffer("ERR: " + std::to_string(status) + " " + registadb::StatusCode_Name(status)), zmq::send_flags::none);
+                    break;
+                }
             }
 
             // fetch entry

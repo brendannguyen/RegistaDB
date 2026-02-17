@@ -24,7 +24,6 @@ message RegistaObject {
     }
 }
 
-
 // universal envelope for RegistaDB
 message RegistaRequest {
     oneof payload {
@@ -33,4 +32,12 @@ message RegistaRequest {
         int64 delete_id = 3;
         string status_check = 4;
     }
+}
+
+enum StatusCode {
+    SUCCESS = 0;
+    ERR_TYPE_MISMATCH = 1;
+    ERR_INTERNAL_ERROR = 2;
+    ERR_STORAGE_FULL = 3;
+    ERR_UNKNOWN_TYPE = 4;
 }

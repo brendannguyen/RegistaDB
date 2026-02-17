@@ -19,7 +19,9 @@ registadb/Playbook$RegistaObject$1.class
 registadb/Playbook$MapValue$FieldsDefaultEntryHolder.class
 registadb/Playbook$MapValue$Builder.class
 registadb/Playbook$RegistaRequest$PayloadCase.class
+registadb/Playbook$StatusCode.class
 registadb/Playbook$ListValue.class
+registadb/Playbook$StatusCode$1.class
 com/registadb/TestRegistaClient.class
 com/registadb/RegistaClient.class
 registadb/Playbook$ListValueOrBuilder.class

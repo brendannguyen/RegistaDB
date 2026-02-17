@@ -2,6 +2,8 @@ package com.registadb; // Make sure this matches your folder structure!
 
 import registadb.Playbook.RegistaObject;
 import registadb.Playbook.RegistaRequest;
+import registadb.Playbook.StatusCode;
+
 import com.google.protobuf.ByteString;
 
 public class TestRegistaClient {
@@ -21,6 +23,16 @@ public class TestRegistaClient {
 
             // small sleep to ensure C++ has processed the pull
             Thread.sleep(100);
+
+            // // ingest from the smart lane
+            // System.out.println("Storing log via Port 5556 with verification...");
+            // String response = client.storeLogVerified(newData);
+
+            // if (response.equals("OK")) {
+            //     System.out.println("Success! Log stored with verification.");
+            // } else {
+            //     System.out.println("Failed to store log: " + response);
+            // }
 
             // query from the smart lane
             System.out.println("Querying for ID " + testId + " on Port 5556...");

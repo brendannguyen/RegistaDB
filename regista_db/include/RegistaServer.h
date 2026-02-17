@@ -21,9 +21,9 @@ private:
 
     void HandleIngest();
     void HandleQuery();
-    
+
 protected:
-    void PrepareEntry(registadb::RegistaObject& entry);
+    registadb::StatusCode PrepareEntry(registadb::RegistaObject& entry);
 };
 
 #endif

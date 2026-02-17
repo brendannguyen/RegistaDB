@@ -14,6 +14,141 @@ public final class Playbook {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  /**
+   * Protobuf enum {@code registadb.StatusCode}
+   */
+  public enum StatusCode
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>SUCCESS = 0;</code>
+     */
+    SUCCESS(0),
+    /**
+     * <code>ERR_TYPE_MISMATCH = 1;</code>
+     */
+    ERR_TYPE_MISMATCH(1),
+    /**
+     * <code>ERR_INTERNAL_ERROR = 2;</code>
+     */
+    ERR_INTERNAL_ERROR(2),
+    /**
+     * <code>ERR_STORAGE_FULL = 3;</code>
+     */
+    ERR_STORAGE_FULL(3),
+    /**
+     * <code>ERR_UNKNOWN_TYPE = 4;</code>
+     */
+    ERR_UNKNOWN_TYPE(4),
+    UNRECOGNIZED(-1),
+    ;
+
+    /**
+     * <code>SUCCESS = 0;</code>
+     */
+    public static final int SUCCESS_VALUE = 0;
+    /**
+     * <code>ERR_TYPE_MISMATCH = 1;</code>
+     */
+    public static final int ERR_TYPE_MISMATCH_VALUE = 1;
+    /**
+     * <code>ERR_INTERNAL_ERROR = 2;</code>
+     */
+    public static final int ERR_INTERNAL_ERROR_VALUE = 2;
+    /**
+     * <code>ERR_STORAGE_FULL = 3;</code>
+     */
+    public static final int ERR_STORAGE_FULL_VALUE = 3;
+    /**
+     * <code>ERR_UNKNOWN_TYPE = 4;</code>
+     */
+    public static final int ERR_UNKNOWN_TYPE_VALUE = 4;
+
+
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static StatusCode valueOf(int value) {
+      return forNumber(value);
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     */
+    public static StatusCode forNumber(int value) {
+      switch (value) {
+        case 0: return SUCCESS;
+        case 1: return ERR_TYPE_MISMATCH;
+        case 2: return ERR_INTERNAL_ERROR;
+        case 3: return ERR_STORAGE_FULL;
+        case 4: return ERR_UNKNOWN_TYPE;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<StatusCode>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        StatusCode> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<StatusCode>() {
+            public StatusCode findValueByNumber(int number) {
+              return StatusCode.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalStateException(
+            "Can't get the descriptor of an unrecognized enum value.");
+      }
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return registadb.Playbook.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final StatusCode[] VALUES = values();
+
+    public static StatusCode valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      if (desc.getIndex() == -1) {
+        return UNRECOGNIZED;
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private StatusCode(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:registadb.StatusCode)
+  }
+
   public interface ListValueOrBuilder extends
       // @@protoc_insertion_point(interface_extends:registadb.ListValue)
       com.google.protobuf.MessageOrBuilder {
@@ -4207,8 +4342,10 @@ java.lang.String defaultValue) {
       "B\006\n\004data\"\217\001\n\016RegistaRequest\0221\n\rstore_req" +
       "uest\030\001 \001(\0132\030.registadb.RegistaObjectH\000\022\022" +
       "\n\010fetch_id\030\002 \001(\003H\000\022\023\n\tdelete_id\030\003 \001(\003H\000\022" +
-      "\026\n\014status_check\030\004 \001(\tH\000B\t\n\007payloadb\006prot" +
-      "o3"
+      "\026\n\014status_check\030\004 \001(\tH\000B\t\n\007payload*t\n\nSt" +
+      "atusCode\022\013\n\007SUCCESS\020\000\022\025\n\021ERR_TYPE_MISMAT" +
+      "CH\020\001\022\026\n\022ERR_INTERNAL_ERROR\020\002\022\024\n\020ERR_STOR" +
+      "AGE_FULL\020\003\022\024\n\020ERR_UNKNOWN_TYPE\020\004b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

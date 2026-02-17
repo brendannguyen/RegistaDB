@@ -29,13 +29,13 @@ public class RegistaClient implements AutoCloseable {
     }
 
     // verified Ingest (Uses Port 5556 via oneof envelope)
-    public boolean storeLogVerified(RegistaObject entry) {
+    public String storeLogVerified(RegistaObject entry) {
         RegistaRequest request = RegistaRequest.newBuilder()
                 .setStoreRequest(entry)
                 .build();
         reqSocket.send(request.toByteArray());
         byte[] reply = reqSocket.recv(0);
-        return new String(reply).trim().equals("OK");
+        return new String(reply).trim();
     }
 
     // query (Uses Port 5556 via oneof envelope)
