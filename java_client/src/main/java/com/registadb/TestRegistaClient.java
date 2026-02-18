@@ -20,14 +20,14 @@ public class TestRegistaClient {
 
             // push to the fast lane
             System.out.println("Pushing log to Port 5555...");
-            client.pushLog(newData);
+            client.pushEntry(newData);
 
             // small sleep to ensure C++ has processed the pull
             Thread.sleep(100);
 
             // // ingest from the smart lane
             // System.out.println("Storing log via Port 5556 with verification...");
-            // String response = client.storeLogVerified(newData);
+            // String response = client.storeEntryVerified(newData);
 
             // if (response.equals("OK")) {
             //     System.out.println("Success! Log stored with verification.");

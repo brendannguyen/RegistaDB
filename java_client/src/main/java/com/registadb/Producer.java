@@ -32,7 +32,7 @@ public class Producer {
                     .setBlob(ByteString.copyFromUtf8("Bulk message number " + i))
                     .build();
 
-                client.pushLog(entry);
+                client.pushEntry(entry);
             }
 
             long endTime = System.currentTimeMillis();

@@ -24,12 +24,12 @@ public class RegistaClient implements AutoCloseable {
     }
 
     // high-Speed Ingest (Uses Port 5555)
-    public void pushLog(RegistaObject entry) {
+    public void pushEntry(RegistaObject entry) {
         pushSocket.send(entry.toByteArray());
     }
 
     // verified Ingest (Uses Port 5556 via oneof envelope)
-    public String storeLogVerified(RegistaObject entry) {
+    public String storeEntryVerified(RegistaObject entry) {
         RegistaRequest request = RegistaRequest.newBuilder()
                 .setStoreRequest(entry)
                 .build();
