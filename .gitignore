@@ -11,3 +11,6 @@ regista_db/generated
 # Ignore IDE specific files
 .vscode/
 .idea/
+
+# Ignore target folder for Java client
+java_client/target/

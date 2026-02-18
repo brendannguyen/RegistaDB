@@ -1,7 +1,7 @@
 # RegistaDB
 <img width="150" height="150" alt="registaDB logo" src="https://github.com/user-attachments/assets/5e3c8d1b-c3a1-414e-bc03-6bddf0ecc30c" />
 
-A high-performance C++ middleware engine using RocksDB to orchestrate data ingestion streams from applications.
+A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data ingestion streams from applications.
 
 ## Features
 
@@ -11,6 +11,17 @@ A high-performance C++ middleware engine using RocksDB to orchestrate data inges
 - Two tunnels: performance & smart (PUSH/PULL & REQ/REP)
 - Smart tunnel for verified ingest, read and delete
 - Performance tunnel for non verified ingest
+
+### Proposed Features
+
+- docker-compose deployment
+- Update functionality (delta update)
+- Dashboard (Grafana + Prometheus) + control panel
+- RAM optimised mode
+- Batching mode
+- REST support
+- Scalability support
+- Small app/backend example
 
 ## Guide
 
@@ -65,9 +76,9 @@ mvn exec:java -Dexec.mainClass="com.registadb.Producer"
 mvn exec:java -Dexec.mainClass="com.registadb.Producer" -Dexec.args="500"
 ```
 
-### Development Guide
+## Development Guide
 
-#### Playbook changes (proto)
+### Playbook changes (proto)
 
 1. Rebuild registaDB engine
 
@@ -77,7 +88,7 @@ cmake ..
 make
 ```
 
-#### Engine Changes (src, c++)
+### Engine Changes (src, c++)
 
 1. Compile & run
 
@@ -86,7 +97,7 @@ cd regista_db/build
 make && ./registadb_engine
 ```
 
-#### Client changes (java)
+### Client changes (java)
 
 1. Compile
 
@@ -101,7 +112,9 @@ mvn compile
 mvn exec:java -Dexec.mainClass="com.registadb.Producer"
 ```
 
-#### Run tests (C++)
+## Testing
+
+### C++ Testing
 
 1. Compile (if not already)
 
@@ -114,4 +127,14 @@ make
 
 ```
 ./regista_tests
+```
+
+### Java Testing (RegistaDB Server)
+
+1. Run JUnit Tests
+
+```
+cd java_client
+
+mvn test
 ```

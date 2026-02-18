@@ -6,7 +6,12 @@ import registadb.Playbook.StatusCode;
 
 import com.google.protobuf.ByteString;
 
-
+/**
+ * TestRegistaClient is a simple Java application that demonstrates how to use the RegistaClient to perform various operations against the RegistaDB server.
+ * It tests pushing a log entry via the fast lane (Port 5555), fetching it back via the smart lane (Port 5556), and then deleting it.
+ * 
+ * This class serves as a basic integration test for the RegistaClient and can be expanded with additional test cases as needed.
+ */
 public class TestRegistaClient {
     public static void main(String[] args) {
         try (RegistaClient client = new RegistaClient("localhost")) {
@@ -20,14 +25,14 @@ public class TestRegistaClient {
 
             // push to the fast lane
             System.out.println("Pushing log to Port 5555...");
-            client.pushLog(newData);
+            client.pushEntry(newData);
 
             // small sleep to ensure C++ has processed the pull
             Thread.sleep(100);
 
             // // ingest from the smart lane
             // System.out.println("Storing log via Port 5556 with verification...");
-            // String response = client.storeLogVerified(newData);
+            // String response = client.storeEntryVerified(newData);
 
             // if (response.equals("OK")) {
             //     System.out.println("Success! Log stored with verification.");
@@ -46,8 +51,8 @@ public class TestRegistaClient {
             }
 
             // delete from smart line
-            boolean status = client.deleteById(testId);
-            if (status) {
+            String status = client.deleteById(testId);
+            if (status.equals("SUCCESS")) {
                 System.out.println(status);
                 System.out.println("Success! Deleted (tombstoned): " + testId);
             } else {
