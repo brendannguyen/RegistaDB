@@ -85,13 +85,17 @@ registadb::StatusCode RegistaServer::PrepareEntry(registadb::RegistaObject& entr
             break;
         // sequential data
         case registadb::RegistaObject::LIST:
-        case registadb::RegistaObject::VECTOR:
             if (entry.data_case() != registadb::RegistaObject::kList) {
                 return registadb::StatusCode::ERR_TYPE_MISMATCH;
             }
             break;
         case registadb::RegistaObject::HASH:
             if (entry.data_case() != registadb::RegistaObject::kHash) {
+                return registadb::StatusCode::ERR_TYPE_MISMATCH;
+            }
+            break;
+        case registadb::RegistaObject::VECTOR:
+            if (entry.data_case() != registadb::RegistaObject::kVector) {
                 return registadb::StatusCode::ERR_TYPE_MISMATCH;
             }
             break;
@@ -137,13 +141,12 @@ void RegistaServer::HandleQuery() {
 
                 registadb::StatusCode status = PrepareEntry(*store_req);
                 if (status == registadb::StatusCode::SUCCESS) {
-                    storage_.StoreEntry(*store_req);
-                    query_socket_.send(zmq::buffer("OK"), zmq::send_flags::none);
-                    break;
-                } else {
-                    query_socket_.send(zmq::buffer("ERR: " + std::to_string(status) + " " + registadb::StatusCode_Name(status)), zmq::send_flags::none);
-                    break;
+                    if (!storage_.StoreEntry(*store_req)) {
+                        status = registadb::StatusCode::ERR_INTERNAL_ERROR;
+                    }
                 }
+                query_socket_.send(zmq::buffer(registadb::StatusCode_Name(status)), zmq::send_flags::none);
+                break;
             }
 
             // fetch entry
@@ -154,7 +157,7 @@ void RegistaServer::HandleQuery() {
                     result.SerializeToString(&serialized);
                     query_socket_.send(zmq::buffer(serialized), zmq::send_flags::none);
                 } else {
-                    query_socket_.send(zmq::buffer("NOT_FOUND"), zmq::send_flags::none);
+                    query_socket_.send(zmq::buffer(registadb::StatusCode_Name(registadb::StatusCode::ERR_NOT_FOUND)), zmq::send_flags::none);
                 }
                 break;
             }
@@ -162,9 +165,9 @@ void RegistaServer::HandleQuery() {
             // delete entry
             case registadb::RegistaRequest::kDeleteId: {
                 if (storage_.DeleteEntryById(envelope.delete_id())) {
-                    query_socket_.send(zmq::buffer("OK"), zmq::send_flags::none);
+                    query_socket_.send(zmq::buffer(registadb::StatusCode_Name(registadb::StatusCode::SUCCESS)), zmq::send_flags::none);
                 } else {
-                    query_socket_.send(zmq::buffer("NOT_FOUND"), zmq::send_flags::none);
+                    query_socket_.send(zmq::buffer(registadb::StatusCode_Name(registadb::StatusCode::ERR_NOT_FOUND)), zmq::send_flags::none);
                 }
                 break;
             }

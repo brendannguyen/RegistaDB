@@ -9,6 +9,14 @@ import com.google.protobuf.ByteString;
 
 import org.zeromq.ZContext;
 
+/**
+ * Producer is a simple Java application that demonstrates how to use the RegistaClient to send log entries to the RegistaDB server.
+ * It can be used for bulk uploading logs via the fast lane (Port 5555) or for testing verified storage and retrieval via the smart lane (Port 5556).
+ * 
+ * Usage:
+ * - To send a single log entry: `java Producer`
+ * - To send multiple log entries: `java Producer <number_of_entries>`
+ */
 public class Producer {
     public static void main(String[] args) throws Exception {
         // Determine how many messages to send
