@@ -76,9 +76,9 @@ mvn exec:java -Dexec.mainClass="com.registadb.Producer"
 mvn exec:java -Dexec.mainClass="com.registadb.Producer" -Dexec.args="500"
 ```
 
-### Development Guide
+## Development Guide
 
-#### Playbook changes (proto)
+### Playbook changes (proto)
 
 1. Rebuild registaDB engine
 
@@ -88,7 +88,7 @@ cmake ..
 make
 ```
 
-#### Engine Changes (src, c++)
+### Engine Changes (src, c++)
 
 1. Compile & run
 
@@ -97,7 +97,7 @@ cd regista_db/build
 make && ./registadb_engine
 ```
 
-#### Client changes (java)
+### Client changes (java)
 
 1. Compile
 
@@ -112,7 +112,9 @@ mvn compile
 mvn exec:java -Dexec.mainClass="com.registadb.Producer"
 ```
 
-#### Run tests (C++)
+## Testing
+
+### C++ Testing
 
 1. Compile (if not already)
 
@@ -125,4 +127,14 @@ make
 
 ```
 ./regista_tests
+```
+
+### Java Testing (RegistaDB Server)
+
+1. Run JUnit Tests
+
+```
+cd java_client
+
+mvn test
 ```
