@@ -3,9 +3,11 @@ package com.registadb;
 import org.junit.jupiter.api.*;
 
 import com.google.protobuf.ByteString;
+import com.registadb.builders.EntryBuilder;
 import com.registadb.builders.EntryValueBuilder;
 import com.registadb.readers.EntryValueReader;
 
+import registadb.Playbook.Entry;
 import registadb.Playbook.EntryValue;
 import registadb.Playbook.OperationStatus;
 import registadb.Playbook.Response;
@@ -317,6 +319,54 @@ public class RegistaIntegrationTest {
                 EntryValue storedValue = readResp.getEntry().getData();
                 assertEquals(content, EntryValueReader.read(storedValue), "Content should match");
             }
+        }
+
+        @Test
+        @Order(9)
+        @DisplayName("Test update")
+        void testUpdate() throws Exception {
+            int testId = 1099;
+            String old_content = "OLD CONTENT";
+            EntryValue old_value = EntryValueBuilder.ofString(old_content);
+
+            Response createResp = client.create(testId, old_value);
+
+            assertEquals(OperationStatus.STATUS_OK, createResp.getStatus(), "Create operation should succeed, instead got: " + createResp.getStatus());
+
+            Thread.sleep(100);
+            Response readResp = client.read(testId);
+
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
+
+            EntryValue storedValue = readResp.getEntry().getData();
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertEquals(old_content, EntryValueReader.read(storedValue), "Content should match");
+
+            // Update entry
+            String new_content = "new CONTENT";
+            EntryValue new_value = EntryValueBuilder.ofString(new_content);
+            Entry entry = new EntryBuilder()
+                                .setId(testId)
+                                .setValue(new_value)
+                                .build();
+
+            Response updateResp = client.update(entry);
+
+            assertEquals(OperationStatus.STATUS_OK, updateResp.getStatus(), "update operation should succeed, instead got: " + updateResp.getStatus());
+
+            Thread.sleep(100);
+            readResp = client.read(testId);
+
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
+
+            EntryValue newStoredValue = readResp.getEntry().getData();
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertNotEquals(old_content, EntryValueReader.read(newStoredValue), "Old Content should not match");
+            assertEquals(new_content, EntryValueReader.read(newStoredValue), "New content should match.");
         }
     }
 

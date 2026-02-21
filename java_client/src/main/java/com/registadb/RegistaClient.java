@@ -173,6 +173,20 @@ public class RegistaClient implements AutoCloseable {
     }
 
     /**
+     * Updates an entry from RegistaDB by its ID, returning the server's response which includes the entry data if found.
+     * @param id The ID of the entry to update.
+     * @return Response from the server indicating the result of the update operation, including the entry data if the update was successful.
+     * @throws IOException if there is an error sending the request or receiving the response.
+     */
+    public Response update(Entry entry) throws IOException {
+        Request req = Request.newBuilder()
+                .setOp(OperationType.OP_UPDATE)
+                .setEntry(entry)
+                .build();
+        return sendWithReply(req);
+    }
+
+    /**
      * Deletes an entry from RegistaDB by its ID, returning the server's response indicating the result of the delete operation.
      * @param id The ID of the entry to delete.
      * @return Response from the server indicating the result of the delete operation.
