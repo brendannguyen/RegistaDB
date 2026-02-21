@@ -40,7 +40,7 @@ client.create(id, value, metadata);
 int testId = 999;
 String content = "Hello RegistaDB!";
 EntryValue value = EntryValueBuilder.ofString(content);
-
+# REQ/REP CREATE
 Response createResp = client.create(testId, value);
 ```
 
@@ -48,7 +48,7 @@ Response createResp = client.create(testId, value);
 int testId = 1000;
 String content = "This is a non-verified ingest test.";
 var value = EntryValueBuilder.ofString(content);
-
+# PERFORMANCE CREATE
 client.createNoReply(testId, value);
 ```
 
