@@ -9,13 +9,13 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 - Create, Read, Update, Delete
 - Index and data column families using reversed big-endian keys (16-byte primary composite key, 8-byte index key)
 - Two tunnels: performance & smart (PUSH/PULL & REQ/REP)
-- Smart tunnel for verified ingest, read and delete
-- Performance tunnel for non verified ingest
-- Supports basic scalar values, basic lists, string maps, json and bytes.
+- Smart tunnel for verified create, read, update, delete
+- Performance tunnel for non verified create
+- Java client that supports basic scalar values, basic lists, string maps, json and bytes.
+- Docker deployment
 
 ### Proposed Features
 
-- docker-compose deployment
 - Dashboard (Grafana + Prometheus) + control panel
 - RAM optimised mode
 - Batching mode
@@ -24,6 +24,27 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 - Small app/backend example
 
 ## Guide
+
+### Docker deployment of RegistaDB
+
+1. Running for first time:
+```
+docker compose up --build
+
+# In background
+docker compose up --build -d
+```
+
+2. Running again:
+```
+docker compose up -d
+```
+
+3. To change volume location for database data *(docker-compose.yml)*:
+```
+volumes:
+- <YOUR_VOLUME_PATH>:/data
+```
 
 ### JAVA Client Usage
 

@@ -1,0 +1,12 @@
+services:
+  registadb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5555:5555"
+      - "5556:5556"
+    volumes:
+      - ./server_data:/data
+    command: ["./registadb_engine", "--path", "/data"]
+    restart: always
