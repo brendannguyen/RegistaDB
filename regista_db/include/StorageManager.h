@@ -20,10 +20,10 @@ public:
     static constexpr const char* kDataCF = "data_cf";
 
     // Write: Saves data and creates the ID index
-    bool StoreEntry(const registadb::RegistaObject& entry);
+    bool StoreEntry(const registadb::Entry& entry);
 
     // Read: Finds data by ID using the index
-    bool GetEntryById(int64_t id, registadb::RegistaObject* out_entry);
+    bool GetEntryById(int64_t id, registadb::Entry* out_entry);
 
     // Delete: Finds data by ID using the index and deletes
     bool DeleteEntryById(int64_t id);
@@ -32,6 +32,7 @@ public:
     std::string EncodeIndexKey(uint64_t id);
     uint64_t DecodeIndexKey(const char* key);
     std::pair<uint64_t, uint64_t> DecodeCompositeKey(const char* key);
+    uint64_t ToEpochMicros(const google::protobuf::Timestamp& ts);
 
     uint64_t GetNextId() {
         return ++global_id_counter_;

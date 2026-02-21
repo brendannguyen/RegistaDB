@@ -1,10 +1,20 @@
 package com.registadb;
 
+import java.util.Map;
+
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
-import registadb.Playbook.RegistaObject;
-import registadb.Playbook.RegistaRequest;
+
+import com.registadb.builders.EntryBuilder;
+
+import java.io.IOException;
+import registadb.Playbook.Entry;
+import registadb.Playbook.EntryValue;
+import registadb.Playbook.OperationType;
+import registadb.Playbook.Request;
+import registadb.Playbook.Response;
+
 
 /**
  * RegistaClient is a Java client for interacting with the RegistaDB server.
@@ -36,62 +46,158 @@ public class RegistaClient implements AutoCloseable {
     }
 
     /**
-     * Pushes a RegistaObject entry to the server via the fast lane (Port 5555).
-     * @param entry The RegistaObject to be sent to the server. This method does not wait for any acknowledgment.
+     * Creates a new entry in RegistaDB with the given value and optional metadata, returning the server's response.
+     * @param value The value to store in the entry.
+     * @return Response from the server indicating the result of the create operation.
+     * @throws IOException if there is an error sending the request or receiving the response.
      */
-    public void pushEntry(RegistaObject entry) {
-        pushSocket.send(entry.toByteArray());
+    public Response create(EntryValue value) throws IOException {
+        return create(0, Map.of(), value);
+    }
+    /**
+     * Creates a new entry in RegistaDB with the given ID and value, returning the server's response.
+     * @param id The ID to assign to the entry (0 for server-generated).
+     * @param value The value to store in the entry.
+     * @return Response from the server indicating the result of the create operation.
+     * @throws IOException if there is an error sending the request or receiving the response.
+     */
+    public Response create(long id, EntryValue value) throws IOException {
+        return create(id, Map.of(), value);
+    }
+    /**
+     * Creates a new entry in RegistaDB with the given metadata and value, returning the server's response.
+     * @param metadata A map of metadata key-value pairs to associate with the entry.
+     * @param value The value to store in the entry.
+     * @return Response from the server indicating the result of the create operation.
+     * @throws IOException if there is an error sending the request or receiving the response.
+     */
+    public Response create(Map<String,String> metadata, EntryValue value) throws IOException {
+        return create(0, metadata, value);
+    }
+    /**
+     * Creates a new entry in RegistaDB with the given ID, metadata, and value, returning the server's response.
+     * @param id The ID to assign to the entry (0 for server-generated).
+     * @param metadata A map of metadata key-value pairs to associate with the entry.
+     * @param value The value to store in the entry.
+     * @return Response from the server indicating the result of the create operation.
+     * @throws IOException if there is an error sending the request or receiving the response.
+     */
+    public Response create(long id, Map<String,String> metadata, EntryValue value) throws IOException {
+        Entry entry = new EntryBuilder()
+                .setId(id)
+                .setMetadata(metadata)
+                .setValue(value)
+                .build();
+
+        Request req = Request.newBuilder()
+                .setOp(OperationType.OP_CREATE)
+                .setEntry(entry)
+                .build();
+
+        return sendWithReply(req);
     }
 
     /**
-     * Sends a RegistaObject entry to the server for storage with verification via the smart lane (Port 5556).
-     * @param entry The RegistaObject to be stored on the server. The server will verify the entry and respond with a status message.
-     * @return A string response from the server indicating the result of the store operation (e.g., "OK", "ERR_TYPE_MISMATCH", "ERR_INTERNAL_ERROR").
+     * Sends a Request protobuf to the server and waits for a Response, handling serialization and deserialization.
+     * @param req The Request protobuf to send to the server.
+     * @return The Response protobuf received from the server.
+     * @throws IOException if there is an error sending the request or receiving the response.
      */
-    public String storeEntryVerified(RegistaObject entry) {
-        RegistaRequest request = RegistaRequest.newBuilder()
-                .setStoreRequest(entry)
-                .build();
-        reqSocket.send(request.toByteArray());
-        byte[] reply = reqSocket.recv(0);
-        return new String(reply).trim();
-    }
+    private Response sendWithReply(Request req) throws IOException {
+        reqSocket.send(req.toByteArray(), 0);
 
-    /**
-     * Fetches a RegistaObject from the server by its ID via the smart lane (Port 5556).
-     * @param id The integer ID of the RegistaObject to be fetched from the server.
-     * @return The RegistaObject corresponding to the provided ID if found; otherwise, returns null if the object is not found or if there was an error.
-     * @throws Exception if there is an error during communication with the server or if the response cannot be parsed as a RegistaObject.
-     */
-    public RegistaObject fetchById(int id) throws Exception {
-        RegistaRequest request = RegistaRequest.newBuilder()
-                .setFetchId(id)
-                .build();
-        reqSocket.send(request.toByteArray());
-        
-        byte[] reply = reqSocket.recv(0);
-        String status = new String(reply).trim();
-        
-        if (status.equals("ERR_NOT_FOUND") || status.equals("UNKNOWN_CMD") || status.equals("ERR_INTERNAL_ERROR")) {
-            return null;
+        byte[] replyBytes = reqSocket.recv(0);
+        if (replyBytes == null) {
+            throw new IOException("No reply received");
         }
-        return RegistaObject.parseFrom(reply);
+
+        Response resp = Response.parseFrom(replyBytes);
+        return resp;
+    }
+
+   /**
+    * Creates a new entry in RegistaDB with the given ID, metadata, and value without waiting for a response from the server (fire-and-forget).
+    * @param value The value to store in the entry.
+    */
+    public void createNoReply(EntryValue value) {
+        createNoReply(0, Map.of(), value);
+    }
+    /**
+     * Creates a new entry in RegistaDB with the given ID and value without waiting for a response from the server (fire-and-forget).
+     * @param id The ID to assign to the entry (0 for server-generated).
+     * @param value The value to store in the entry.
+
+     */
+    public void createNoReply(long id, EntryValue value) {
+        createNoReply(id, Map.of(), value);
+    }
+    /**
+     * Creates a new entry in RegistaDB with the given metadata and value without waiting for a response from the server (fire-and-forget).
+     * @param metadata A map of metadata key-value pairs to associate with the entry.
+      * @param value The value to store in the entry.
+
+     */
+    public void createNoReply(Map<String,String> metadata, EntryValue value) {
+        createNoReply(0, metadata, value);
     }
 
     /**
-     * Deletes (tombstones) a RegistaObject on the server by its ID via the smart lane (Port 5556).
-     * @param id The integer ID of the RegistaObject to be deleted on the server.
-     * @return A string response from the server indicating the result of the delete operation (e.g., "SUCCESS", "ERR_NOT_FOUND", "UNKNOWN_CMD", "ERR_INTERNAL_ERROR").
-     * @throws Exception if there is an error during communication with the server or if the response cannot be parsed correctly.
+     * Creates a new entry in RegistaDB with the given ID, metadata, and value without waiting for a response from the server (fire-and-forget).
+     * @param id The ID to assign to the entry (0 for server-generated).
+     * @param metadata A map of metadata key-value pairs to associate with the entry.
+     * @param value The value to store in the entry.
+
      */
-    public String deleteById(int id) throws Exception {
-        RegistaRequest request = RegistaRequest.newBuilder()
-                .setDeleteId(id)
+    public void createNoReply(long id, Map<String,String> metadata, EntryValue value) {
+        Entry entry = new EntryBuilder()
+                .setId(id)
+                .setMetadata(metadata)
+                .setValue(value)
                 .build();
-        reqSocket.send(request.toByteArray());
-        
-        byte[] reply = reqSocket.recv(0);
-        return new String(reply).trim();
+
+        pushSocket.send(entry.toByteArray(), 0);
+    }
+
+    /**
+     * Fetches an entry from RegistaDB by its ID, returning the server's response which includes the entry data if found.
+     * @param id The ID of the entry to fetch.
+     * @return Response from the server indicating the result of the read operation, including the entry data if the read was successful.
+     * @throws IOException if there is an error sending the request or receiving the response.
+     */
+    public Response read(long id) throws IOException {
+        Request req = Request.newBuilder()
+                .setOp(OperationType.OP_READ)
+                .setId(id)
+                .build();
+        return sendWithReply(req);
+    }
+
+    /**
+     * Updates an entry from RegistaDB by its ID, returning the server's response which includes the entry data if found.
+     * @param id The ID of the entry to update.
+     * @return Response from the server indicating the result of the update operation, including the entry data if the update was successful.
+     * @throws IOException if there is an error sending the request or receiving the response.
+     */
+    public Response update(Entry entry) throws IOException {
+        Request req = Request.newBuilder()
+                .setOp(OperationType.OP_UPDATE)
+                .setEntry(entry)
+                .build();
+        return sendWithReply(req);
+    }
+
+    /**
+     * Deletes an entry from RegistaDB by its ID, returning the server's response indicating the result of the delete operation.
+     * @param id The ID of the entry to delete.
+     * @return Response from the server indicating the result of the delete operation.
+     * @throws IOException if there is an error sending the request or receiving the response.
+     */
+    public Response delete(long id) throws IOException {
+        Request req = Request.newBuilder()
+                .setOp(OperationType.OP_DELETE)
+                .setId(id)
+                .build();
+        return sendWithReply(req);
     }
 
     /**

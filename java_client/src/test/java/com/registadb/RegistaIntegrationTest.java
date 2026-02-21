@@ -3,19 +3,22 @@ package com.registadb;
 import org.junit.jupiter.api.*;
 
 import com.google.protobuf.ByteString;
+import com.registadb.builders.EntryBuilder;
+import com.registadb.builders.EntryValueBuilder;
+import com.registadb.readers.EntryValueReader;
 
-import registadb.Playbook.ListValue;
-import registadb.Playbook.MapValue;
-import registadb.Playbook.RegistaObject;
-import registadb.Playbook.StatusCode;
-import registadb.Playbook.VectorValue;
+import registadb.Playbook.Entry;
+import registadb.Playbook.EntryValue;
+import registadb.Playbook.OperationStatus;
+import registadb.Playbook.Response;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -113,28 +116,23 @@ public class RegistaIntegrationTest {
         @DisplayName("Test Create and Read")
         void testCreateAndRead() throws Exception {
             int testId = 999;
-            String content = "This is a test.";
-            RegistaObject newData = RegistaObject.newBuilder()
-                    .setType(RegistaObject.Type.STRING)
-                    .setId(testId)
-                    .setBlob(ByteString.copyFromUtf8(content))
-                    .build();
+            String content = "Hello RegistaDB!";
+            EntryValue value = EntryValueBuilder.ofString(content);
 
-            // push to the fast lane
-            // System.out.println("Pushing entry to Port 5555...");
-            client.pushEntry(newData);
+            Response createResp = client.create(testId, value);
 
-            // small sleep to ensure C++ has processed the pull
+            assertEquals(OperationStatus.STATUS_OK, createResp.getStatus(), "Create operation should succeed, instead got: " + createResp.getStatus());
+
             Thread.sleep(100);
+            Response readResp = client.read(testId);
 
-             // query from the smart lane
-            // System.out.println("Querying for ID " + testId + " on Port 5556...");
-            RegistaObject retrieved_entry = client.fetchById(testId);
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
 
-            assertNotNull(retrieved_entry, "Entry should be found");
-            assertEquals(testId, retrieved_entry.getId(), "IDs should match");
-            assertEquals(RegistaObject.Type.STRING, retrieved_entry.getType(), "Types should match");
-            assertEquals(content, retrieved_entry.getBlob().toStringUtf8(), "Content should match");
+            EntryValue storedValue = readResp.getEntry().getData();
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertEquals(content, EntryValueReader.read(storedValue), "Content should match");
         }
 
         @Test
@@ -144,199 +142,153 @@ public class RegistaIntegrationTest {
             int testId = 999;
 
             // delete from smart line
-            String deleteStatus = client.deleteById(testId);
-            assertEquals("SUCCESS", deleteStatus, "Delete should return SUCCESS for existing entry");
+            Response deleteStatus = client.delete(testId);
+            assertEquals(OperationStatus.STATUS_OK, deleteStatus.getStatus(), "Delete should return SUCCESS for existing entry");
 
             Thread.sleep(100);
 
             // verify deletion
-            RegistaObject postDeleteEntry = client.fetchById(testId);
-            assertNull(postDeleteEntry, "Entry should be null after deletion");
+            Response postDeleteEntry = client.read(testId);
+            assertEquals(OperationStatus.STATUS_NOT_FOUND, postDeleteEntry.getStatus(), "Read after delete should return NOT_FOUND");
         }
 
         @Test
         @Order(3)
-        @DisplayName("Test Verified Ingest")
-        void testVerifiedIngest() throws Exception {
+        @DisplayName("Test Non Verified Ingest")
+        void testNonVerifiedIngest() throws Exception {
             int testId = 1000;
-            String content = "This is a verified ingest test.";
-            RegistaObject newData = RegistaObject.newBuilder()
-                    .setType(RegistaObject.Type.STRING)
-                    .setId(testId)
-                    .setBlob(ByteString.copyFromUtf8(content))
-                    .build();
+            String content = "This is a non-verified ingest test.";
+            var value = EntryValueBuilder.ofString(content);
 
-            // ingest from the smart lane
-            // System.out.println("Storing entry via Port 5556 with verification...");
-            String response = client.storeEntryVerified(newData);
-            assertEquals("SUCCESS", response, "Response should be SUCCESS for successful verified ingest, instead got: " + response);
+            client.createNoReply(testId, value);
 
             Thread.sleep(100);
 
             // query to verify storage
             // System.out.println("Querying for ID " + testId + " on Port 5556...");
-            RegistaObject retrieved_entry = client.fetchById(testId);
+            Response postIngestResp = client.read(testId);
 
-            assertNotNull(retrieved_entry, "Entry should be found");
-            assertEquals(testId, retrieved_entry.getId(), "IDs should match");
-            assertEquals(RegistaObject.Type.STRING, retrieved_entry.getType(), "Types should match");
-            assertEquals(content, retrieved_entry.getBlob().toStringUtf8(), "Content should match");
+            assertNotNull(postIngestResp.getEntry(), "Entry should be found");
+
+            EntryValue storedValue = postIngestResp.getEntry().getData();
+
+            assertEquals(testId, postIngestResp.getEntry().getId(), "IDs should match");
+            assertEquals(content, EntryValueReader.read(storedValue), "Content should match");
         }
 
         @Test
         @Order(4)
-        @DisplayName("Test Malformed Type & Data Ingest")
-        void testMalformedTypeAndDataIngest() throws Exception {
-            int testId = 1001;
-            String content = "This entry has a mismatched type.";
-            RegistaObject malformedData = RegistaObject.newBuilder()
-                    .setType(RegistaObject.Type.LIST) // Intentionally wrong type
-                    .setId(testId)
-                    .setBlob(ByteString.copyFromUtf8(content))
-                    .build();
+        @DisplayName("Test List Type Ingest and Retrieval")
+        void testListTypeIngestAndRetrieval() throws Exception {
+            int testId = 1002;
+            List<Integer> int_content = List.of(10, 2 , 3);
+            List<Long> content = int_content.stream().map(Integer::longValue).toList();
+            EntryValue value = EntryValueBuilder.ofIntList(content);
 
-            // ingest from the smart lane
-            // System.out.println("Attempting to store malformed entry via Port 5556...");
-            String response = client.storeEntryVerified(malformedData);
-            assertEquals("ERR_TYPE_MISMATCH", response, "Response should indicate type mismatch, instead got: " + response);
+            Response createResp = client.create(testId, value);
+
+            assertEquals(OperationStatus.STATUS_OK, createResp.getStatus(), "Create operation should succeed, instead got: " + createResp.getStatus());
 
             Thread.sleep(100);
+            Response readResp = client.read(testId);
 
-            // query to verify it was not stored
-            // System.out.println("Querying for ID " + testId + " on Port 5556...");
-            RegistaObject retrieved_entry = client.fetchById(testId);
-            assertNull(retrieved_entry, "Malformed entry should not be stored");
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
+
+            EntryValue storedValue = readResp.getEntry().getData();
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertEquals(content, EntryValueReader.read(storedValue), "Content should match");
         }
 
         @Test
         @Order(5)
-        @DisplayName("Test List Type Ingest and Retrieval")
-        void testListTypeIngestAndRetrieval() throws Exception {
-            int testId = 1002;
-            ListValue listContent = ListValue.newBuilder()
-                    .addElements(ByteString.copyFromUtf8("First item"))
-                    .addElements(ByteString.copyFromUtf8("Second item"))
-                    .build();
-            RegistaObject listData = RegistaObject.newBuilder()
-                    .setType(RegistaObject.Type.LIST)
-                    .setId(testId)
-                    .setList(listContent)
-                    .build();
+        @DisplayName("Test Hash Type Ingest and Retrieval")
+        void testHashTypeIngestAndRetrieval() throws Exception {
+            int testId = 1003;
+            Map<String, String> content = Map.of(
+                "type", "event",
+                "source", "java",
+                "status", "active"
+            );
+            EntryValue value = EntryValueBuilder.ofStringMap(content);
 
-            // ingest from the smart lane
-            // System.out.println("Storing list entry via Port 5556...");
-            String response = client.storeEntryVerified(listData);
-            assertEquals("SUCCESS", response, "Response should be SUCCESS for successful list ingest, instead got: " + response);
+            Response createResp = client.create(testId, value);
+
+            assertEquals(OperationStatus.STATUS_OK, createResp.getStatus(), "Create operation should succeed, instead got: " + createResp.getStatus());
 
             Thread.sleep(100);
+            Response readResp = client.read(testId);
 
-            // query to verify storage
-            // System.out.println("Querying for ID " + testId + " on Port 5556...");
-            RegistaObject retrieved_entry = client.fetchById(testId);
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
 
-            assertNotNull(retrieved_entry, "Entry should be found");
-            assertEquals(testId, retrieved_entry.getId(), "IDs should match");
-            assertEquals(RegistaObject.Type.LIST, retrieved_entry.getType(), "Types should match");
-            assertEquals(listContent, retrieved_entry.getList(), "List content should match");
+            EntryValue storedValue = readResp.getEntry().getData();
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertEquals(content, EntryValueReader.read(storedValue), "Content should match");
         }
 
         @Test
         @Order(6)
-        @DisplayName("Test Hash Type Ingest and Retrieval")
-        void testHashTypeIngestAndRetrieval() throws Exception {
-            int testId = 1003;
-            MapValue mapContent = MapValue.newBuilder()
-                    .putFields("key1", ByteString.copyFromUtf8("value1"))
-                    .putFields("key2", ByteString.copyFromUtf8("value2"))
-                    .build();
-            RegistaObject hashData = RegistaObject.newBuilder()
-                    .setType(RegistaObject.Type.HASH)
-                    .setId(testId)
-                    .setHash(mapContent)
-                    .build();
+        @DisplayName("Test JSON Type Ingest and Retrieval")
+        void testJsonTypeIngestAndRetrieval() throws Exception {
+            int testId = 1004;
+            Map<String, Object> content = Map.of(
+                "name", "Bob",
+                "city", "Melbourne",
+                "active", true,
+                "score", 99
+            );
 
-            // ingest from the smart lane
-            // System.out.println("Storing hash entry via Port 5556...");
-            String response = client.storeEntryVerified(hashData);
-            assertEquals("SUCCESS", response, "Response should be SUCCESS for successful hash ingest, instead got: " + response);
+            EntryValue value = EntryValueBuilder.ofJson(content);
+
+            Response createResp = client.create(testId, value);
+
+            assertEquals(OperationStatus.STATUS_OK, createResp.getStatus(), "Create operation should succeed, instead got: " + createResp.getStatus());
 
             Thread.sleep(100);
+            Response readResp = client.read(testId);
 
-            // query to verify storage
-            // System.out.println("Querying for ID " + testId + " on Port 5556...");
-            RegistaObject retrieved_entry = client.fetchById(testId);
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
 
-            assertNotNull(retrieved_entry, "Entry should be found");
-            assertEquals(testId, retrieved_entry.getId(), "IDs should match");
-            assertEquals(RegistaObject.Type.HASH, retrieved_entry.getType(), "Types should match");
-            assertEquals(mapContent, retrieved_entry.getHash(), "Hash content should match");
+            EntryValue storedValue = readResp.getEntry().getData();
+            var struct = (com.google.protobuf.Struct) EntryValueReader.read(storedValue);
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertEquals("Bob", struct.getFieldsOrThrow("name").getStringValue());
+            assertEquals("Melbourne", struct.getFieldsOrThrow("city").getStringValue());
+            assertTrue(struct.getFieldsOrThrow("active").getBoolValue());
+            assertEquals(99.0, struct.getFieldsOrThrow("score").getNumberValue(), 0.001);
         }
 
         @Test
         @Order(7)
-        @DisplayName("Test JSON Type Ingest and Retrieval")
-        void testJsonTypeIngestAndRetrieval() throws Exception {
-            int testId = 1004;
-            String jsonContent = "{\"name\": \"Alice\", \"age\": 30}";
-            RegistaObject jsonData = RegistaObject.newBuilder()
-                    .setType(RegistaObject.Type.JSON)
-                    .setId(testId)
-                    .setBlob(ByteString.copyFromUtf8(jsonContent))
-                    .build();
+        @DisplayName("Test Vector Type Ingest and Retrieval")
+        void testVectorTypeIngestAndRetrieval() throws Exception {
+            int testId = 1005;
+            List<Double> content = List.of(11.1, 2.22234567, 4765.11096);
+            EntryValue value = EntryValueBuilder.ofDoubleList(content);
 
-            // ingest from the smart lane
-            // System.out.println("Storing JSON entry via Port 5556...");
-            String response = client.storeEntryVerified(jsonData);
-            assertEquals("SUCCESS", response, "Response should be SUCCESS for successful JSON ingest, instead got: " + response);
+            Response createResp = client.create(testId, value);
+
+            assertEquals(OperationStatus.STATUS_OK, createResp.getStatus(), "Create operation should succeed, instead got: " + createResp.getStatus());
 
             Thread.sleep(100);
+            Response readResp = client.read(testId);
 
-            // query to verify storage
-            // System.out.println("Querying for ID " + testId + " on Port 5556...");
-            RegistaObject retrieved_entry = client.fetchById(testId);
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
 
-            assertNotNull(retrieved_entry, "Entry should be found");
-            assertEquals(testId, retrieved_entry.getId(), "IDs should match");
-            assertEquals(RegistaObject.Type.JSON, retrieved_entry.getType(), "Types should match");
-            assertEquals(jsonContent, retrieved_entry.getBlob().toStringUtf8(), "JSON content should match");
+            EntryValue storedValue = readResp.getEntry().getData();
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertEquals(content, EntryValueReader.read(storedValue), "Content should match");
         }
 
         @Test
         @Order(8)
-        @DisplayName("Test Vector Type Ingest and Retrieval")
-        void testVectorTypeIngestAndRetrieval() throws Exception {
-            int testId = 1005;
-            VectorValue vectorValue = VectorValue.newBuilder()
-                    .addElements(1.0f)
-                    .addElements(2.0f)
-                    .addElements(3.0f)
-                    .build();
-
-            RegistaObject vectorData = RegistaObject.newBuilder()
-                    .setType(RegistaObject.Type.VECTOR)
-                    .setId(testId)
-                    .setVector(vectorValue)
-                    .build();
-
-            // ingest from the smart lane
-            // System.out.println("Storing vector entry via Port 5556...");
-            String response = client.storeEntryVerified(vectorData);
-            assertEquals("SUCCESS", response, "Response should be SUCCESS for successful vector ingest, instead got: " + response);
-
-            Thread.sleep(100);
-
-            // query to verify storage
-            // System.out.println("Querying for ID " + testId + " on Port 5556...");
-            RegistaObject retrieved_entry = client.fetchById(testId);
-
-            assertNotNull(retrieved_entry, "Entry should be found");
-            assertEquals(testId, retrieved_entry.getId(), "IDs should match");
-            assertEquals(RegistaObject.Type.VECTOR, retrieved_entry.getType(), "Types should match");
-            assertEquals(vectorValue, retrieved_entry.getVector(), "Vector content should match");
-        }
-
-        @Test
-        @Order(9)
         @DisplayName("Test server ID generation")
         void testServerIdGeneration() throws Exception {
             List<String> generatedIdContent = new ArrayList<>();
@@ -345,15 +297,12 @@ public class RegistaIntegrationTest {
             }
 
             for (String idContent : generatedIdContent) {
-                RegistaObject newData = RegistaObject.newBuilder()
-                        .setType(RegistaObject.Type.STRING)
-                        .setBlob(ByteString.copyFromUtf8(idContent))
-                        .build();
+                EntryValue value = EntryValueBuilder.ofString(idContent);
 
                 // ingest from the smart lane
                 // System.out.println("Storing entry with server-generated ID via Port 5556...");
-                String response = client.storeEntryVerified(newData);
-                assertEquals("SUCCESS", response, "Response should be SUCCESS for successful ingest, instead got: " + response);
+                Response createResp = client.create(value);
+                assertEquals(OperationStatus.STATUS_OK, createResp.getStatus(), "Create operation should succeed, instead got: " + createResp.getStatus());
             }
 
             Thread.sleep(100);
@@ -362,13 +311,62 @@ public class RegistaIntegrationTest {
             for (int i = 1; i <= generatedIdContent.size(); i++) {
                 String content = generatedIdContent.get(i-1);
                 // System.out.println("Querying for generated ID " + i + " on Port 5556...");
-                RegistaObject retrieved_entry = client.fetchById(i);
+                Response readResp = client.read(i);
 
-                assertNotNull(retrieved_entry, "Entry should be found");
-                assertEquals(i, retrieved_entry.getId(), "IDs should match");
-                assertEquals(RegistaObject.Type.STRING, retrieved_entry.getType(), "Types should match");
-                assertEquals(content, retrieved_entry.getBlob().toStringUtf8(), "Content should match");
+                assertNotNull(readResp, "Read response should not be null");
+                assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
+                assertEquals(i, readResp.getEntry().getId(), "IDs should match");
+                EntryValue storedValue = readResp.getEntry().getData();
+                assertEquals(content, EntryValueReader.read(storedValue), "Content should match");
             }
+        }
+
+        @Test
+        @Order(9)
+        @DisplayName("Test update")
+        void testUpdate() throws Exception {
+            int testId = 1099;
+            String old_content = "OLD CONTENT";
+            EntryValue old_value = EntryValueBuilder.ofString(old_content);
+
+            Response createResp = client.create(testId, old_value);
+
+            assertEquals(OperationStatus.STATUS_OK, createResp.getStatus(), "Create operation should succeed, instead got: " + createResp.getStatus());
+
+            Thread.sleep(100);
+            Response readResp = client.read(testId);
+
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
+
+            EntryValue storedValue = readResp.getEntry().getData();
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertEquals(old_content, EntryValueReader.read(storedValue), "Content should match");
+
+            // Update entry
+            String new_content = "new CONTENT";
+            EntryValue new_value = EntryValueBuilder.ofString(new_content);
+            Entry entry = new EntryBuilder()
+                                .setId(testId)
+                                .setValue(new_value)
+                                .build();
+
+            Response updateResp = client.update(entry);
+
+            assertEquals(OperationStatus.STATUS_OK, updateResp.getStatus(), "update operation should succeed, instead got: " + updateResp.getStatus());
+
+            Thread.sleep(100);
+            readResp = client.read(testId);
+
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
+
+            EntryValue newStoredValue = readResp.getEntry().getData();
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertNotEquals(old_content, EntryValueReader.read(newStoredValue), "Old Content should not match");
+            assertEquals(new_content, EntryValueReader.read(newStoredValue), "New content should match.");
         }
     }
 
@@ -380,17 +378,10 @@ public class RegistaIntegrationTest {
         @DisplayName("Test that stored entries persist across server restarts")
         void testPersistenceAcrossRestarts() throws Exception {
             int testId = 2000;
-            String content = "This entry should persist across restarts.";
-            RegistaObject newData = RegistaObject.newBuilder()
-                    .setType(RegistaObject.Type.STRING)
-                    .setId(testId)
-                    .setBlob(ByteString.copyFromUtf8(content))
-                    .build();
+            String content = "This is a non-verified ingest test.";
+            var value = EntryValueBuilder.ofString(content);
 
-            // ingest from the smart lane
-            // System.out.println("Storing entry for persistence test via Port 5556...");
-            String response = client.storeEntryVerified(newData);
-            assertEquals("SUCCESS", response, "Response should be SUCCESS for successful ingest, instead got: " + response);
+            client.createNoReply(testId, value);
 
             Thread.sleep(100);
 
@@ -406,16 +397,15 @@ public class RegistaIntegrationTest {
 
             Thread.sleep(1000); // wait for server to start
 
-            // query to verify persistence
-            // System.out.println("Querying for ID " + testId + " after restart on Port 5556...");
-            RegistaObject retrieved_entry = client.fetchById(testId);
+            Response readResp = client.read(testId);
 
-            assertNotNull(retrieved_entry, "Entry should be found after restart");
-            assertEquals(testId, retrieved_entry.getId(), "IDs should match");
-            assertEquals(RegistaObject.Type.STRING, retrieved_entry.getType(), "Types should match");
-            assertEquals(content, retrieved_entry.getBlob().toStringUtf8(), "Content should match");
+            assertNotNull(readResp, "Read response should not be null");
+            assertNotNull(readResp.getEntry(), "Entry in read response should not be null");
+
+            EntryValue storedValue = readResp.getEntry().getData();
+
+            assertEquals(testId, readResp.getEntry().getId(), "IDs should match");
+            assertEquals(content, EntryValueReader.read(storedValue), "Content should match");
         }
     }
-    
-
 }

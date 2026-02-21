@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <thread>
 #include <chrono>
+#include <google/protobuf/util/time_util.h>
 #include "StorageManager.h"
 
 namespace fs = std::filesystem;
@@ -65,22 +66,30 @@ TEST_F(StorageTest, EncodingIndexSymmetry) {
 // Test reverse sorting of keys
 TEST_F(StorageTest, NewestEntriesComeFirst) {
     // Store an "Old" entry
-    auto now = std::chrono::system_clock::now();
-    auto ms = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+    uint64_t micros = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+    google::protobuf::Timestamp now;
+    now.set_seconds(micros / 1'000'000);
+    now.set_nanos((micros % 1'000'000) * 1000);
 
-    registadb::RegistaObject old_obj;
+
+    registadb::Entry old_obj;
     old_obj.set_id(1);
-    old_obj.set_timestamp(ms);
+    old_obj.mutable_created_at()->CopyFrom(now);
     storage->StoreEntry(old_obj);
 
     // Wait a tiny bit and store a "New" entry
     std::this_thread::sleep_for(std::chrono::microseconds(2));
-    now = std::chrono::system_clock::now();
-    ms = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+    micros = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+    now.set_seconds(micros / 1'000'000);
+    now.set_nanos((micros % 1'000'000) * 1000);
     
-    registadb::RegistaObject new_obj;
+    registadb::Entry new_obj;
     new_obj.set_id(2);
-    new_obj.set_timestamp(ms);
+    new_obj.mutable_created_at()->CopyFrom(now);
     storage->StoreEntry(new_obj);
 
     // Create an iterator and check the first result
@@ -88,7 +97,7 @@ TEST_F(StorageTest, NewestEntriesComeFirst) {
     it->SeekToFirst();
     
     // The very first item must be the NEWEST one (ID 2)
-    registadb::RegistaObject first;
+    registadb::Entry first;
     first.ParseFromString(it->value().ToString());
     EXPECT_EQ(first.id(), 2);
     delete it;
@@ -98,29 +107,32 @@ TEST_F(StorageTest, NewestEntriesComeFirst) {
 TEST_F(StorageTest, HandlesBinaryData) {
     std::string tricky_data = "Null\0Byte Test\0With\0Multiple\0Nulls";
     tricky_data += std::string("\0", 1); // Add a null byte at the end
+    google::protobuf::Timestamp now =
+    google::protobuf::util::TimeUtil::GetCurrentTime();
 
-    registadb::RegistaObject obj;
-    obj.set_type(registadb::RegistaObject_Type_STRING);
+    registadb::Entry obj;
     obj.set_id(123);
-    obj.set_timestamp(123456789);
-    obj.set_blob(tricky_data);
+    obj.mutable_created_at()->CopyFrom(now);
+    obj.mutable_data()->set_bytes_value(tricky_data);
 
     storage->StoreEntry(obj);
 
-    registadb::RegistaObject retrieved;
+    registadb::Entry retrieved;
     storage->GetEntryById(123, &retrieved);
 
-    EXPECT_EQ(retrieved.blob(), tricky_data);
-    EXPECT_EQ(retrieved.blob().size(), tricky_data.size());
+    EXPECT_EQ(retrieved.data().bytes_value(), tricky_data);
+    EXPECT_EQ(retrieved.data().bytes_value().size(), tricky_data.size());
 }
 
 // Test that composite key prevents collisions when rapidly ingesting entries with the same timestamp
 TEST_F(StorageTest, RapidIngestionNoCollisions) {
+    google::protobuf::Timestamp now =
+    google::protobuf::util::TimeUtil::GetCurrentTime();
     const int count = 1000;
     for (int i = 0; i < count; ++i) {
-        registadb::RegistaObject obj;
+        registadb::Entry obj;
         obj.set_id(i);
-        obj.set_timestamp(123456789);
+        obj.mutable_created_at()->CopyFrom(now);
         storage->StoreEntry(obj);
     }
 

@@ -44,15 +44,15 @@ TEST_F(ServerLogicTest, PrepareEntry) {
     
     RegistaServerTester* server = new  RegistaServerTester(*storage, 5555, 5556);
 
-    registadb::RegistaObject obj;
+    registadb::Entry obj;
     obj.set_id(500);
     
     // Ensure timestamp is 0 initially
-    ASSERT_EQ(obj.timestamp(), 0);
+    ASSERT_EQ(obj.created_at().seconds(), 0);
     
     // Call the protected method
     server->PrepareEntry(obj);
     
     // After preparation, timestamp should be set to a non-zero value (e.g., current time)
-    ASSERT_NE(obj.timestamp(), 0);
+    ASSERT_NE(obj.created_at().seconds(), 0);
 }

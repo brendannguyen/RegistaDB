@@ -6,16 +6,16 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 ## Features
 
 - Uses RocksDB for database storage on SSD.
-- Create, Read, Delete
+- Create, Read, Update, Delete
 - Index and data column families using reversed big-endian keys (16-byte primary composite key, 8-byte index key)
 - Two tunnels: performance & smart (PUSH/PULL & REQ/REP)
 - Smart tunnel for verified ingest, read and delete
 - Performance tunnel for non verified ingest
+- Supports basic scalar values, basic lists, string maps, json and bytes.
 
 ### Proposed Features
 
 - docker-compose deployment
-- Update functionality (delta update)
 - Dashboard (Grafana + Prometheus) + control panel
 - RAM optimised mode
 - Batching mode
@@ -24,6 +24,59 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 - Small app/backend example
 
 ## Guide
+
+### JAVA Client Usage
+
+#### Creating entries:
+
+```
+client.create(value);
+client.create(id, value);
+client.create(value, metadata);
+client.create(id, value, metadata);
+```
+
+```
+int testId = 999;
+String content = "Hello RegistaDB!";
+EntryValue value = EntryValueBuilder.ofString(content);
+# REQ/REP CREATE
+Response createResp = client.create(testId, value);
+```
+
+```
+int testId = 1000;
+String content = "This is a non-verified ingest test.";
+var value = EntryValueBuilder.ofString(content);
+# PERFORMANCE CREATE
+client.createNoReply(testId, value);
+```
+
+#### Reading entries:
+
+```
+Response postIngestResp = client.read(testId);
+EntryValue storedValue = postIngestResp.getEntry().getData();
+EntryValueReader.read(storedValue)
+```
+
+#### Updating entries:
+
+```
+Entry entry = new EntryBuilder()
+        .setId(id) # id to update
+        .setMetadata(metadata)
+        .setValue(value)
+        .build();
+
+Response updateResp = client.update(entry)
+```
+
+#### Deleting entries:
+
+```
+Response deleteResp = client.delete(testId);
+```
 
 ### Setup RocksDB & RegistaDB Engine
 
