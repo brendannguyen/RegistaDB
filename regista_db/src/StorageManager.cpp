@@ -127,15 +127,26 @@ uint64_t StorageManager::DecodeIndexKey(const char* key) {
 }
 
 /**
- * @brief Stores a RegistaObject entry in RocksDB by writing to both the index and data column families atomically using a WriteBatch.
+ * @brief Converts a google::protobuf::Timestamp to microseconds since epoch.
  * 
- * @param entry The RegistaObject to store, which should already be prepared (timestamp set, ID generated if needed).
- * @return true: The entry was successfully stored in RocksDB.
- * @return false: There was an error writing the entry to RocksDB.
+ * @param ts The timestamp to convert.
+ * @return uint64_t The timestamp in microseconds since epoch.
  */
-bool StorageManager::StoreEntry(const registadb::RegistaObject& entry) {
+uint64_t StorageManager::ToEpochMicros(const google::protobuf::Timestamp& ts) {
+    return ts.seconds() * 1000000ULL + ts.nanos() / 1000ULL;
+}
+
+
+/**
+ * @brief Stores an entry in RocksDB by creating a composite key for the data column family and an index entry for the ID column family, using a WriteBatch for atomicity.
+ * 
+ * @param entry The entry to store.
+ * @return true if the entry was successfully stored.
+ * @return false if there was an error storing the entry.
+ */
+bool StorageManager::StoreEntry(const registadb::Entry& entry) {
     // prepare keys
-    uint64_t entry_timestamp = static_cast<uint64_t>(entry.timestamp());
+    uint64_t entry_timestamp = ToEpochMicros(entry.created_at());
     uint64_t entry_id = static_cast<uint64_t>(entry.id());
     std::string primary_key = EncodeCompositeKey(entry_timestamp, entry_id);
     std::string index_key = EncodeIndexKey(entry_id);
@@ -156,14 +167,14 @@ bool StorageManager::StoreEntry(const registadb::RegistaObject& entry) {
 }
 
 /**
- * @brief Gets a RegistaObject entry from RocksDB by looking up the ID in the index column family to find the primary key, then retrieving the actual data from the data column family.
+ * @brief Retrieves an entry from RocksDB by its ID.
  * 
  * @param id The ID of the entry to retrieve.
- * @param out_entry The RegistaObject to populate with the retrieved data.
- * @return true: The entry was successfully retrieved.
- * @return false: There was an error retrieving the entry.
+ * @param out_entry The output entry to populate with the retrieved data.
+ * @return true if the entry was successfully retrieved.
+ * @return false if there was an error retrieving the entry.
  */
-bool StorageManager::GetEntryById(int64_t id, registadb::RegistaObject* out_entry) {
+bool StorageManager::GetEntryById(int64_t id, registadb::Entry* out_entry) {
     uint64_t entry_id = static_cast<uint64_t>(id);
     std::string index_key = EncodeIndexKey(entry_id);
     std::string primary_key;
@@ -183,7 +194,7 @@ bool StorageManager::GetEntryById(int64_t id, registadb::RegistaObject* out_entr
 }
 
 /**
- * @brief Deletes (tombstones) a RegistaObject entry from RocksDB by looking up the ID in the index column family to find the primary key, then deleting both the index and data entries atomically using a WriteBatch.
+ * @brief Deletes (tombstones) an entry from RocksDB by looking up the ID in the index column family to find the primary key, then deleting both the index and data entries atomically using a WriteBatch.
  * 
  * @param id The ID of the entry to delete.
  * @return true: The entry was successfully deleted.

@@ -27,7 +27,8 @@ private:
     void HandleQuery();
 
 protected:
-    registadb::StatusCode PrepareEntry(registadb::RegistaObject& entry);
+    bool PrepareEntry(registadb::Entry& entry);
+    void SendResponse(const registadb::Response& resp);
 };
 
 #endif

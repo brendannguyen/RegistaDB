@@ -2,56 +2,101 @@ syntax = "proto3";
 
 package registadb;
 
-/**
- * @brief Protobuf definitions for RegistaObject, which represents the core data structure stored in RegistaDB.
- * 
- */
-message ListValue { repeated bytes elements = 1; }
-message MapValue  { map<string, bytes> fields = 1; }
-message VectorValue { repeated float elements = 1 [packed = true]; }
-message RegistaObject {
-    enum Type {
-        STRING = 0;
-        LIST = 1;
-        HASH = 2;
-        JSON = 3;
-        VECTOR = 4;
-    }
-    Type type = 1;
-    uint64 id = 2;
-    int64 timestamp = 3;
-    map<string, string> metadata = 4;
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
-    oneof data {
-        bytes blob = 5;
-        ListValue list = 6;
-        MapValue hash = 7;
-        VectorValue vector = 8;
-    }
+// -----------------------------
+// Generic Value
+// -----------------------------
+message StringList {
+  repeated string value = 1;
 }
 
-/**
- * @brief Universal envelope for RegistaDB requests, allowing for different types of operations (store, fetch, delete, status check) to be represented in a single message format.
- * 
- */
-message RegistaRequest {
-    oneof payload {
-        RegistaObject store_request = 1;
-        int64 fetch_id = 2;
-        int64 delete_id = 3;
-        string status_check = 4;
-    }
+message IntList {
+  repeated int64 value = 1;
 }
 
-/**
- * @brief Status codes for RegistaDB operations, used in responses to indicate success or specific error conditions.
- * 
- */
-enum StatusCode {
-    SUCCESS = 0;
-    ERR_TYPE_MISMATCH = 1;
-    ERR_INTERNAL_ERROR = 2;
-    ERR_STORAGE_FULL = 3;
-    ERR_UNKNOWN_TYPE = 4;
-    ERR_NOT_FOUND = 5;
+message DoubleList {
+  repeated double value = 1;
+}
+
+message BoolList {
+  repeated bool value = 1;
+}
+
+message StringMap {
+  map<string,string> value = 1;
+}
+
+message EntryValue {
+  oneof kind {
+    string string_value = 1;
+    double double_value = 2;
+    int64 int_value = 3;
+    bool bool_value = 4;
+
+    StringList string_list = 5;
+    DoubleList double_list = 6;
+    IntList int_list = 7;
+    BoolList bool_list = 8;
+    StringMap string_map = 9;
+
+    google.protobuf.Struct json_value = 10;
+
+    bytes bytes_value = 11;
+  }
+}
+
+// -----------------------------
+// Entry stored in RocksDB
+// -----------------------------
+message Entry {
+  uint64 id = 1; // optional: 0 = server generates
+  map<string, string> metadata = 2;
+  EntryValue data = 3;
+
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+// -----------------------------
+// CRUD operation type
+// -----------------------------
+enum OperationType {
+  OP_UNKNOWN = 0;
+  OP_CREATE = 1;
+  OP_READ = 2;
+  OP_UPDATE = 3;
+  OP_DELETE = 4;
+}
+
+// -----------------------------
+// Generic Request
+// -----------------------------
+message Request {
+  OperationType op = 1;
+
+  // For CREATE/UPDATE
+  Entry entry = 2;
+
+  // For READ/DELETE
+  uint64 id = 3;
+}
+
+// -----------------------------
+// Generic Response
+// -----------------------------
+enum OperationStatus {
+  STATUS_OK = 0;
+  STATUS_NOT_FOUND = 1;
+  STATUS_INVALID_ARGUMENT = 2;
+  STATUS_INTERNAL_ERROR = 3;
+}
+
+message Response {
+  OperationStatus status = 1;
+  string message = 2;
+
+  // For CREATE/READ/UPDATE
+  Entry entry = 3;
 }

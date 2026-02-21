@@ -1,63 +1,56 @@
-package com.registadb; // Make sure this matches your folder structure!
+package com.registadb;
 
-import registadb.Playbook.RegistaObject;
-import registadb.Playbook.RegistaRequest;
-import registadb.Playbook.StatusCode;
+import registadb.Playbook.EntryValue;
+import registadb.Playbook.OperationStatus;
+import registadb.Playbook.Response;
 
-import com.google.protobuf.ByteString;
+import com.registadb.builders.EntryValueBuilder;
+import com.registadb.readers.EntryValueReader;
 
 /**
- * TestRegistaClient is a simple Java application that demonstrates how to use the RegistaClient to perform various operations against the RegistaDB server.
- * It tests pushing a log entry via the fast lane (Port 5555), fetching it back via the smart lane (Port 5556), and then deleting it.
- * 
- * This class serves as a basic integration test for the RegistaClient and can be expanded with additional test cases as needed.
+ * TestRegistaClient is a simple test class to demonstrate the usage of RegistaClient for basic CRUD operations.
+ * It creates an entry, reads it back, and then deletes it, printing the results at each step.
  */
 public class TestRegistaClient {
     public static void main(String[] args) {
         try (RegistaClient client = new RegistaClient("localhost")) {
             
             int testId = 999;
-            RegistaObject newData = RegistaObject.newBuilder()
-                    .setType(RegistaObject.Type.STRING)
-                    .setId(testId)
-                    .setBlob(ByteString.copyFromUtf8("This is a test."))
-                    .build();
+            EntryValue value = EntryValueBuilder.ofString("Hello RegistaDB!");
 
-            // push to the fast lane
-            System.out.println("Pushing log to Port 5555...");
-            client.pushEntry(newData);
+            Response createResp = client.create(testId, value);
 
-            // small sleep to ensure C++ has processed the pull
-            Thread.sleep(100);
+            if (createResp.getStatus() != OperationStatus.STATUS_OK) {
+                throw new RuntimeException("Create failed: " + createResp.getMessage());
+            }
+            System.out.println("Created entry with ID = " + testId);
 
-            // // ingest from the smart lane
-            // System.out.println("Storing log via Port 5556 with verification...");
-            // String response = client.storeEntryVerified(newData);
+            Response readResp = client.read(testId);
 
-            // if (response.equals("OK")) {
-            //     System.out.println("Success! Log stored with verification.");
-            // } else {
-            //     System.out.println("Failed to store log: " + response);
-            // }
-
-            // query from the smart lane
-            System.out.println("Querying for ID " + testId + " on Port 5556...");
-            RegistaObject fetched = client.fetchById(testId);
-
-            if (fetched != null) {
-                System.out.println("Success! Found: " + fetched.getBlob().toStringUtf8());
-            } else {
-                System.out.println("Log not found yet.");
+            if (readResp.getStatus() != OperationStatus.STATUS_OK) {
+                throw new RuntimeException("Read failed: " + readResp.getMessage());
             }
 
-            // delete from smart line
-            String status = client.deleteById(testId);
-            if (status.equals("SUCCESS")) {
-                System.out.println(status);
-                System.out.println("Success! Deleted (tombstoned): " + testId);
+            EntryValue storedValue = readResp.getEntry().getData();
+
+            Object extracted = EntryValueReader.read(storedValue);
+
+            System.out.println("Extracted Java value = " + extracted);
+
+            Response deleteResp = client.delete(testId);
+
+            if (deleteResp.getStatus() != OperationStatus.STATUS_OK) {
+                throw new RuntimeException("Delete failed: " + deleteResp.getMessage());
+            }
+
+            System.out.println("Deleted entry with ID = " + testId);
+
+            Response readAfterDelete = client.read(testId);
+
+            if (readAfterDelete.getStatus() == OperationStatus.STATUS_NOT_FOUND) {
+                System.out.println("Confirmed deletion: entry " + testId + " no longer exists");
             } else {
-                System.out.println(status);
-                System.out.println("Log not found/deleted.");
+                System.out.println("Unexpected read result: " + readAfterDelete.getStatus());
             }
 
         } catch (Exception e) {
