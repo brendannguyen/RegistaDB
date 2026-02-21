@@ -4,6 +4,7 @@ regista_db/build
 # Ignore database data
 regista_db/data
 data/
+server_data/
 
 # Ignore manual generated files
 regista_db/generated
@@ -11,6 +12,7 @@ regista_db/generated
 # Ignore IDE specific files
 .vscode/
 .idea/
+.git/
 
 # Ignore target folder for Java client
 java_client/target/
