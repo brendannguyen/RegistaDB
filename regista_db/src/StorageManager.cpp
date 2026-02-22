@@ -9,6 +9,7 @@
  * @brief Construct a new Storage Manager:: Storage Manager object
  * 
  * @param db_path The path to the RocksDB database directory
+ * @param enable_stats Whether to enable or disable rocksDB statistics
  */
 StorageManager::StorageManager(const std::string& db_path, bool enable_stats) {
     options.create_if_missing = true;
