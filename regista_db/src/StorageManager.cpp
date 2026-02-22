@@ -2,6 +2,7 @@
 #include <rocksdb/write_batch.h>
 #include <iostream>
 #include <arpa/inet.h>
+#include "rocksdb/statistics.h"
 
 
 /**
@@ -9,9 +10,15 @@
  * 
  * @param db_path The path to the RocksDB database directory
  */
-StorageManager::StorageManager(const std::string& db_path) {
+StorageManager::StorageManager(const std::string& db_path, bool enable_stats) {
     options.create_if_missing = true;
     options.create_missing_column_families = true;
+
+    if (enable_stats) {
+        this->rocks_stats = rocksdb::CreateDBStatistics();
+        options.statistics = this->rocks_stats;
+        options.statistics->set_stats_level(rocksdb::StatsLevel::kExceptDetailedTimers);
+    }
 
     // column families
     std::vector<rocksdb::ColumnFamilyDescriptor> column_families;

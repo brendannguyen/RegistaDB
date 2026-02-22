@@ -15,6 +15,9 @@ find_library(SNAPPY_LIB snappy REQUIRED)
 find_package(Protobuf REQUIRED)
 find_library(ZMQ_LIB zmq REQUIRED)
 
+# Find prometheus-cpp
+find_package(prometheus-cpp CONFIG REQUIRED)
+
 # Where to find your .proto file and where to put the generated code
 set(PROTO_SRC "../proto/playbook.proto")
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_SRC})
@@ -23,7 +26,8 @@ protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_SRC})
 add_executable(registadb_engine 
     src/main.cpp
     src/StorageManager.cpp 
-    src/RegistaServer.cpp 
+    src/RegistaServer.cpp
+    src/MetricsExporter.cpp 
     ${PROTO_SRCS} 
     ${PROTO_HDRS}
 )
@@ -45,6 +49,8 @@ target_link_libraries(registadb_engine
     ${SNAPPY_LIB}
     ${Protobuf_LIBRARIES}
     ${ZMQ_LIB}
+    prometheus-cpp::core
+    prometheus-cpp::pull
     pthread 
     dl
 )
@@ -67,6 +73,7 @@ add_executable(regista_tests
     tests/unit/regista_test.cpp
     src/StorageManager.cpp
     src/RegistaServer.cpp
+    src/MetricsExporter.cpp 
     ${PROTO_SRCS}
     ${PROTO_HDRS}
 )
@@ -82,6 +89,8 @@ target_link_libraries(regista_tests PRIVATE
     ${ROCKSDB_LIB}
     ${Z_LIB} ${BZ2_LIB} ${LZ4_LIB} ${ZSTD_LIB} ${SNAPPY_LIB}
     ${Protobuf_LIBRARIES} ${ZMQ_LIB}
+    prometheus-cpp::core
+    prometheus-cpp::pull
     pthread dl
 )
 

@@ -109,6 +109,7 @@ sudo apt install librocksdb-dev libsnappy-dev libzstd-dev liblz4-dev libbz2-dev 
 sudo apt install build-essential gdb
 sudo apt install protobuf-compiler
 sudo apt install libzmq3-dev
+sudo apt install prometheus-cpp-dev
 ```
 
 2. Create C++ build files
