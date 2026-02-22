@@ -6,7 +6,46 @@ services:
     ports:
       - "5555:5555"
       - "5556:5556"
+      - "8080:8080" # Metrics
+    environment:
+      - REGISTADB_STORE_PATH=/data
+      - ENABLE_STATS=false
     volumes:
       - ./server_data:/data
-    command: ["./registadb_engine", "--path", "/data"]
+    command: ["./registadb_engine"]
     restart: always
+    networks:
+      - registanet
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    profiles: ["metrics"]
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - registanet
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    profiles: ["metrics"]
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - registanet
+
+networks:
+  registanet:
+
+volumes:
+  prometheus_data:
+  grafana_data:

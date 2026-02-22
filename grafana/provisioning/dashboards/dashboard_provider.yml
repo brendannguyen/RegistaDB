@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: 'RocksDBProvider'
+    orgId: 1
+    folder: 'RegistaDB'
+    type: file
+    disableDeletion: true
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/storage

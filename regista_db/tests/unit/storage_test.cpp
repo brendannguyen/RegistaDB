@@ -30,7 +30,7 @@ protected:
             fs::remove_all(test_path);
         }
         // Initialize your StorageManager pointing to the test path
-        storage = new StorageManagerTester(test_path);
+        storage = new StorageManagerTester(test_path, false);
     }
 
     // Runs AFTER every test

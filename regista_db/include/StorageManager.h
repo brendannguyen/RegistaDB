@@ -13,7 +13,7 @@
  */
 class StorageManager {
 public:
-    StorageManager(const std::string& db_path);
+    StorageManager(const std::string& db_path, bool enable_stats);
     ~StorageManager();
 
     static constexpr const char* kIndexCF = "index_cf";
@@ -40,9 +40,14 @@ public:
     void SetStartingId(uint64_t id) {
         global_id_counter_.store(id);
     }
+
+    std::shared_ptr<rocksdb::Statistics> GetStats() const {
+        return rocks_stats;
+    }
 private:
     rocksdb::DB* db;
     rocksdb::Options options;
+    std::shared_ptr<rocksdb::Statistics> rocks_stats;
     rocksdb::ColumnFamilyHandle* index_handle_ = nullptr;
     rocksdb::ColumnFamilyHandle* data_handle_ = nullptr;
     rocksdb::ColumnFamilyHandle* default_handle_ = nullptr;

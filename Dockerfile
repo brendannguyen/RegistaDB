@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
     libzmq3-dev \
     cppzmq-dev \
+    prometheus-cpp-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . .
@@ -39,6 +40,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libbz2-1.0 \
     zlib1g \
     libzmq5 \
+    libprometheus-cpp-core1.0 \
+    libprometheus-cpp-pull1.0 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/regista_db/build/registadb_engine .
