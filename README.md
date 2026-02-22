@@ -13,10 +13,11 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 - Performance tunnel for non verified create
 - Java client that supports basic scalar values, basic lists, string maps, json and bytes.
 - Docker deployment
+- Grafana Dashboard with Prometheus
 
 ### Proposed Features
 
-- Dashboard (Grafana + Prometheus) + control panel
+- Control panel
 - RAM optimised mode
 - Batching mode
 - REST support
@@ -29,6 +30,7 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 
 1. Running for first time:
 ```
+# without metrics
 docker compose up --build
 
 # In background
@@ -43,7 +45,27 @@ docker compose up -d
 3. To change volume location for database data *(docker-compose.yml)*:
 ```
 volumes:
-- <YOUR_VOLUME_PATH>:/data
+  - <YOUR_VOLUME_PATH>:/data
+```
+
+4. To enable stats (Prometheus + Grafana):
+```
+environment:
+  - ENABLE_STATS=true
+```
+
+```
+docker compose up --build --profile metrics
+
+docker compose down --build --profile metrics
+```
+
+5. To change database store path inside container:
+```
+environment:
+  - REGISTADB_STORE_PATH=<container_db_path>
+volumes:
+  - ./server_data:<container_db_path>
 ```
 
 ### JAVA Client Usage

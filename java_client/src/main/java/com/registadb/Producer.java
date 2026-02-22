@@ -39,6 +39,8 @@ public class Producer {
             long endTime = System.currentTimeMillis();
             System.out.println("Finished! Sent " + numEntries + " messages in " + (endTime - startTime) + "ms");
 
+            Thread.sleep(1000);
+
             Response readResp = client.read(final_id);
 
             if (readResp.getStatus() != OperationStatus.STATUS_OK) {

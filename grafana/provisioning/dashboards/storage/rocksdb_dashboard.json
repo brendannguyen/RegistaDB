@@ -1,0 +1,120 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Write Throughput",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "irate(rocksdb_internal_stats{ticker=\"bytes_written\"}[1m])",
+          "legendFormat": "Writes"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "binBps",
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }
+        }
+      }
+    },
+    {
+      "title": "Read Throughput",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "irate(rocksdb_internal_stats{ticker=\"bytes_read\"}[1m])",
+          "legendFormat": "Reads"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "binBps",
+          "color": { "mode": "fixed", "fixedColor": "green" },
+          "custom": { "fillOpacity": 10 }
+        }
+      }
+    },
+    {
+      "title": "Block Cache Hit Rate (%)",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "(sum(rocksdb_internal_stats{ticker=\"block_cache_hit\"}) / (sum(rocksdb_internal_stats{ticker=\"block_cache_hit\"}) + sum(rocksdb_internal_stats{ticker=\"block_cache_miss\"}))) * 100",
+          "legendFormat": "Hit Rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "green", "value": 90 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Write Stalls (Duration)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 8 },
+      "targets": [
+        {
+          "expr": "irate(rocksdb_internal_stats{ticker=\"stall_micros\"}[1m])",
+          "legendFormat": "Stall μs/s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "µs",
+          "color": { "mode": "fixed", "fixedColor": "red" }
+        }
+      }
+    },
+    {
+      "title": "Memtable vs Cache Distribution",
+      "type": "bargauge",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+      "targets": [
+        { "expr": "sum(irate(rocksdb_internal_stats{ticker=\"memtable_hit\"}[1m]))", "legendFormat": "Memtable" },
+        { "expr": "sum(irate(rocksdb_internal_stats{ticker=\"block_cache_hit\"}[1m]))", "legendFormat": "Block Cache" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "continuous-GrYlRd" },
+          "custom": { "lineWidth": 0, "fillOpacity": 80 },
+          "unit": "ops"
+        }
+      },
+      "options": {
+        "orientation": "vertical",
+        "displayMode": "gradient",
+        "showUnfilled": true
+      }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["rocksdb", "cpp"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "RegistaDB Engine Performance",
+  "version": 1
+}
