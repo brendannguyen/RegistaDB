@@ -34,9 +34,11 @@ void RegistaServer::Run() {
         { static_cast<void*>(query_socket_),  0, ZMQ_POLLIN, 0 }
     };
     try {
-        while (keep_running) {
+        while (keep_running && running_) {
             // poll for 100ms
-            zmq::poll(&items[0], 2, std::chrono::milliseconds(100));
+            int rc = zmq::poll(&items[0], 2, std::chrono::milliseconds(100));
+
+            if (rc == 0) continue;
 
             // handle Ingest (PUSH/PULL)
             if (items[0].revents & ZMQ_POLLIN) {
@@ -56,6 +58,13 @@ void RegistaServer::Run() {
     }
     
     std::cout << "Server loop stopped. Cleaning up sockets..." << std::endl;
+    ingest_socket_.close();
+    query_socket_.close();
+    std::cout << "Engine sockets closed cleanly." << std::endl;
+}
+
+void RegistaServer::Stop() {
+    running_ = false;
 }
 
 /**
@@ -131,32 +140,36 @@ void RegistaServer::HandleQuery() {
         resp.set_message("Failed to parse Request protobuf");
         SendResponse(resp);
         return;
+    } else {
+        registadb::Response resp = ExecuteRequest(req);
+        SendResponse(resp);
+        return;
     }
+  
+}
+
+registadb::Response RegistaServer::ExecuteRequest(const registadb::Request& req) {
+    registadb::Response resp;
 
     switch (req.op()) {
 
         case registadb::OP_CREATE: {
             if (!req.has_entry()) {
-                registadb::Response resp;
                 resp.set_status(registadb::STATUS_INVALID_ARGUMENT);
                 resp.set_message("Missing entry for CREATE");
-                SendResponse(resp);
                 break;
             }
 
             registadb::Entry entry = req.entry();
 
             if (!PrepareEntry(entry)) {
-                registadb::Response resp;
                 resp.set_status(registadb::STATUS_INTERNAL_ERROR);
                 resp.set_message("Unable to prepare entry for CREATE");
-                SendResponse(resp);
                 break;
             }
 
             bool ok = storage_.StoreEntry(entry);
 
-            registadb::Response resp;
             if (!ok) {
                 resp.set_status(registadb::STATUS_INTERNAL_ERROR);
                 resp.set_message("Failed to store entry");
@@ -164,8 +177,6 @@ void RegistaServer::HandleQuery() {
                 resp.set_status(registadb::STATUS_OK);
                 resp.mutable_entry()->CopyFrom(entry);
             }
-
-            SendResponse(resp);
             break;
         }
 
@@ -173,7 +184,6 @@ void RegistaServer::HandleQuery() {
             uint64_t id = req.id();
 
             registadb::Entry entry;
-            registadb::Response resp;
 
             if (storage_.GetEntryById(id, &entry)) {
                 resp.set_status(registadb::STATUS_OK);
@@ -182,37 +192,43 @@ void RegistaServer::HandleQuery() {
                 resp.set_status(registadb::STATUS_NOT_FOUND);
                 resp.set_message("Entry not found");
             }
-
-            SendResponse(resp);
             break;
         }
 
         case registadb::OP_UPDATE: {
             if (!req.has_entry()) {
-                registadb::Response resp;
                 resp.set_status(registadb::STATUS_INVALID_ARGUMENT);
                 resp.set_message("Missing entry for UPDATE");
-                SendResponse(resp);
                 break;
             }
 
             registadb::Entry entry = req.entry();
 
             if (entry.id() == 0) {
-                registadb::Response resp;
                 resp.set_status(registadb::STATUS_INVALID_ARGUMENT);
                 resp.set_message("UPDATE requires a valid id");
-                SendResponse(resp);
+                break;
+            }
+
+            registadb::Entry old_entry;
+            if (!storage_.GetEntryById(entry.id(), &old_entry)) {
+                resp.set_status(registadb::STATUS_NOT_FOUND);
+                resp.set_message("Entry not found");
                 break;
             }
 
             // Update timestamp
-            auto now = google::protobuf::util::TimeUtil::GetCurrentTime();
+            uint64_t micros = std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::system_clock::now().time_since_epoch()
+            ).count();
+            google::protobuf::Timestamp now;
+            now.set_seconds(micros / 1'000'000);
+            now.set_nanos((micros % 1'000'000) * 1000);
             entry.mutable_updated_at()->CopyFrom(now);
+            entry.mutable_created_at()->CopyFrom(old_entry.created_at());
 
             bool ok = storage_.StoreEntry(entry);
 
-            registadb::Response resp;
             if (!ok) {
                 resp.set_status(registadb::STATUS_INTERNAL_ERROR);
                 resp.set_message("Failed to update entry");
@@ -221,31 +237,26 @@ void RegistaServer::HandleQuery() {
                 resp.mutable_entry()->CopyFrom(entry);
             }
 
-            SendResponse(resp);
             break;
         }
 
         case registadb::OP_DELETE: {
             uint64_t id = req.id();
 
-            registadb::Response resp;
             if (storage_.DeleteEntryById(id)) {
                 resp.set_status(registadb::STATUS_OK);
             } else {
                 resp.set_status(registadb::STATUS_NOT_FOUND);
                 resp.set_message("Entry not found");
             }
-
-            SendResponse(resp);
             break;
         }
 
         default: {
-            registadb::Response resp;
             resp.set_status(registadb::STATUS_INVALID_ARGUMENT);
             resp.set_message("Unknown operation");
-            SendResponse(resp);
             break;
         }
-    } 
+    }
+    return resp;
 }

@@ -6,6 +6,7 @@
 
 namespace fs = std::filesystem;
 std::atomic<bool> keep_running(true);
+RegistaServer* g_regista_server = nullptr;
 
 class ServerLogicTest : public ::testing::Test {
 protected:

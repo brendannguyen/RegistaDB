@@ -123,6 +123,12 @@ Response deleteResp = client.delete(testId);
 
 ### Setup RocksDB & RegistaDB Engine
 
+0. Clone repository
+
+```
+git clone --recursive https://github.com/brendannguyen/RegistaDB.git
+```
+
 1. Install dependencies
 
 ```
@@ -132,6 +138,9 @@ sudo apt install build-essential gdb
 sudo apt install protobuf-compiler
 sudo apt install libzmq3-dev
 sudo apt install prometheus-cpp-dev
+sudo apt install git gcc g++ cmake
+sudo apt install libjsoncpp-dev
+sudo apt install uuid-dev
 ```
 
 2. Create C++ build files

@@ -3,6 +3,8 @@ project(RegistaDB)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory(drogon)
+
 # Find RocksDB and Compression
 find_library(ROCKSDB_LIB rocksdb REQUIRED)
 find_library(Z_LIB z REQUIRED)
@@ -28,6 +30,7 @@ add_executable(registadb_engine
     src/StorageManager.cpp 
     src/RegistaServer.cpp
     src/MetricsExporter.cpp 
+    src/controllers/EntryController.cpp
     ${PROTO_SRCS} 
     ${PROTO_HDRS}
 )
@@ -36,6 +39,8 @@ add_executable(registadb_engine
 target_include_directories(registadb_engine PRIVATE 
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/drogon/lib/inc
+    ${PROJECT_SOURCE_DIR}/drogon/trantor
 )
 
 # Link Protobuf along with RocksDB
@@ -53,6 +58,7 @@ target_link_libraries(registadb_engine
     prometheus-cpp::pull
     pthread 
     dl
+    drogon
 )
 
 # --- GOOGLE TEST SETUP ---
@@ -74,6 +80,7 @@ add_executable(regista_tests
     src/StorageManager.cpp
     src/RegistaServer.cpp
     src/MetricsExporter.cpp 
+    src/controllers/EntryController.cpp
     ${PROTO_SRCS}
     ${PROTO_HDRS}
 )
@@ -81,6 +88,8 @@ add_executable(regista_tests
 target_include_directories(regista_tests PRIVATE 
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/drogon/lib/inc
+    ${PROJECT_SOURCE_DIR}/drogon/trantor
 )
 
 # Link tests against GTest, RocksDB, and Protobuf
@@ -92,6 +101,7 @@ target_link_libraries(regista_tests PRIVATE
     prometheus-cpp::core
     prometheus-cpp::pull
     pthread dl
+    drogon
 )
 
 # This enables the 'make test' command and automatic test discovery
