@@ -14,10 +14,11 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 - Java client that supports basic scalar values, basic lists, string maps, json and bytes.
 - Docker deployment
 - Grafana Dashboard with Prometheus
-- REST support using Drogon, with Swagger UI
+- REST support using Drogon
 
 ### Proposed Features
 
+- Swagger UI
 - Control panel
 - RAM optimised mode
 - Batching mode

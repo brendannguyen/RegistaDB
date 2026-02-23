@@ -63,6 +63,10 @@ void RegistaServer::Run() {
     std::cout << "Engine sockets closed cleanly." << std::endl;
 }
 
+/**
+ * @brief Stops the running loop of the registaDB Server
+ * 
+ */
 void RegistaServer::Stop() {
     running_ = false;
 }
@@ -148,6 +152,13 @@ void RegistaServer::HandleQuery() {
   
 }
 
+
+/**
+ * @brief Executes RegistaDB query requests, executing logic according to request operation code.
+ * 
+ * @param req The request to fulfill
+ * @return registadb::Response 
+ */
 registadb::Response RegistaServer::ExecuteRequest(const registadb::Request& req) {
     registadb::Response resp;
 

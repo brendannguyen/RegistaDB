@@ -6,6 +6,12 @@ extern RegistaServer* g_regista_server;
 
 namespace api {
 
+    /**
+     * @brief Maps a registadb::OperationStatus to an appropriate HTTP status code for the response.
+     * 
+     * @param status The internal operation status to map.
+     * @return drogon::HttpStatusCode The corresponding HTTP status code.
+     */
     drogon::HttpStatusCode mapStatus(registadb::OperationStatus status) {
         switch (status) {
             case registadb::STATUS_OK:               
@@ -20,7 +26,14 @@ namespace api {
                 return k500InternalServerError;
         }
     }
-
+    
+    /**
+     * @brief Handles HTTP GET requests to read any entry by ID.
+     * 
+     * @param req The incoming HTTP request containing the entry ID in the URL path and optional "Accept" header for response format.
+     * @param callback The callback function to send the HTTP response asynchronously.
+     * @param id The ID of the entry to read, extracted from the URL path.
+     */
     void EntryController::handleRead(const HttpRequestPtr& req, 
                                     std::function<void(const HttpResponsePtr&)>&& callback, 
                                     uint64_t id) {
@@ -62,6 +75,12 @@ namespace api {
         callback(resp);
     }
 
+    /**
+     * @brief Handles HTTP POST requests to create a new entry, accepting either JSON or Protobuf request bodies.
+     * 
+     * @param req The incoming HTTP request containing the entry data in the body and optional "Content-Type" header to indicate format.
+     * @param callback The callback function to send the HTTP response asynchronously.
+     */
     void EntryController::handleCreate(const HttpRequestPtr& req, 
                                     std::function<void(const HttpResponsePtr&)>&& callback) {
         if (!g_regista_server) {
@@ -123,6 +142,13 @@ namespace api {
         callback(resp);
     }
 
+    /**
+     * @brief Handles HTTP PUT requests to update an existing entry by ID, accepting either JSON or Protobuf request bodies.
+     * 
+     * @param req The incoming HTTP request containing the updated entry data in the body and optional "Content-Type" header to indicate format.
+     * @param callback The callback function to send the HTTP response asynchronously.
+     * @param id The ID of the entry to update, extracted from the URL path.
+     */
     void EntryController::handleUpdate(const HttpRequestPtr& req, 
                                     std::function<void(const HttpResponsePtr&)>&& callback, 
                                     uint64_t id) {
@@ -185,6 +211,13 @@ namespace api {
         callback(resp);
     }
 
+    /**
+     * @brief Handles HTTP DELETE requests to delete an existing entry by ID.
+     * 
+     * @param req The incoming HTTP request containing the entry ID in the URL path.
+     * @param callback The callback function to send the HTTP response asynchronously.
+     * @param id The ID of the entry to delete, extracted from the URL path.
+     */
     void EntryController::handleDelete(const HttpRequestPtr& req, 
                                     std::function<void(const HttpResponsePtr&)>&& callback, 
                                     uint64_t id) {

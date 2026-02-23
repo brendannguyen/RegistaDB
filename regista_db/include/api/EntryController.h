@@ -5,6 +5,10 @@ using namespace drogon;
 
 namespace api {
 
+    /**
+     * @brief Handles HTTP requests for CRUD operations on entries, translating them into internal requests to RegistaServer and formatting responses accordingly. Supports both JSON and Protobuf response formats based on the client's "Accept" header.
+     * 
+     */
     class EntryController : public drogon::HttpController<EntryController> {
     public:
         METHOD_LIST_BEGIN
