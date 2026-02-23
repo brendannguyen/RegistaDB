@@ -49,6 +49,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/regista_db/build/registadb_engine .
+COPY --from=builder /app/static ./static
+RUN chmod -R 755 /root/static
 
 EXPOSE 5555
 EXPOSE 5556

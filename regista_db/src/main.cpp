@@ -11,6 +11,7 @@
 
 std::atomic<bool> keep_running(true);
 RegistaServer* g_regista_server = nullptr;
+namespace fs = std::filesystem;
 
 /**
  * @brief Handles system signals (e.g., SIGINT) to gracefully shut down the server.
@@ -105,6 +106,36 @@ int main(int argc, char* argv[]) {
         }
         cccb(); // continue to the actual controller
     });
+
+    bool enable_swagger_ui = false;
+    const char* env_swagger_ui = std::getenv("ENABLE_SWAGGER_UI");
+    if (env_swagger_ui && (std::string(env_swagger_ui) == "true" || std::string(env_swagger_ui) == "1")) {
+        enable_swagger_ui = true;
+    }
+
+    if (enable_swagger_ui) {
+        std::vector<std::string> paths = {
+            "/app/static",                 // Docker path
+            "./static",                    
+            "../static",                   
+            "../../static",
+            "../../../static"                
+        };
+
+        std::string foundPath = "";
+        for (const auto& p : paths) {
+            if (fs::exists(p + "/app/docs/index.html")) {
+                foundPath = p;
+                break;
+            }
+        }
+
+        if (!foundPath.empty()) {
+            std::cout << "Swagger UI is ENABLED at /app/docs/index.html" << std::endl;
+            drogon::app().setDocumentRoot(foundPath);
+            drogon::app().setFileTypes({"html", "js", "css", "yaml", "json", "png", "txt"});
+        }
+    }
 
     std::cout << "RESTful: 8081" << std::endl;
     drogon::app().addListener("0.0.0.0", 8081).run();

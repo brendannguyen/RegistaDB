@@ -11,6 +11,7 @@ services:
     environment:
       - REGISTADB_STORE_PATH=/data
       - ENABLE_STATS=false
+      - ENABLE_SWAGGER_UI=true
     volumes:
       - ./server_data:/data
     command: ["./registadb_engine"]

@@ -1,0 +1,149 @@
+openapi: 3.0.3
+info:
+  title: Regista DB API
+  description: C++ Middleware gateway/DBMS for Protobuf/RocksDB storage.
+  version: 1.0.0
+
+servers:
+  - url: /
+    description: Drogon Server (Default Port 8081)
+
+components:
+  schemas:
+    Entry:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Used for creation. Note: In UPDATE/PUT, the URL path ID overrides this value."
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            source: "thermal_sensor"
+            location: "rack_4"
+        data:
+          $ref: '#/components/schemas/EntryValue'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: "Controlled by the application"
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: "Controlled by the application"
+
+    EntryValue:
+      type: object
+      description: "Protobuf oneof: only one field should be provided."
+      oneOf:
+        - properties: { string_value: { type: string } }
+        - properties: { double_value: { type: number, format: double } }
+        - properties: { int_value: { type: integer, format: int64 } }
+        - properties: { bool_value: { type: boolean } }
+        - properties: { string_list: { $ref: '#/components/schemas/StringList' } }
+        - properties: { double_list: { $ref: '#/components/schemas/DoubleList' } }
+        - properties: { int_list: { $ref: '#/components/schemas/IntList' } }
+        - properties: { bool_list: { $ref: '#/components/schemas/BoolList' } }
+        - properties: { string_map: { $ref: '#/components/schemas/StringMap' } }
+        - properties: { json_value: { type: object } }
+        - properties: { bytes_value: { type: string, format: byte } }
+
+    # Helper schemas for Protobuf repeated/map types
+    StringList:
+      type: object
+      properties: { value: { type: array, items: { type: string } } }
+    IntList:
+      type: object
+      properties: { value: { type: array, items: { type: integer, format: int64 } } }
+    DoubleList:
+      type: object
+      properties: { value: { type: array, items: { type: number, format: double } } }
+    BoolList:
+      type: object
+      properties: { value: { type: array, items: { type: boolean } } }
+    StringMap:
+      type: object
+      properties: { value: { type: object, additionalProperties: { type: string } } }
+
+  responses:
+    BadRequest:
+      description: Invalid Argument (e.g., Malformed JSON or Protobuf)
+      content:
+        text/plain: { schema: { type: string, example: "Invalid JSON body\n" } }
+    NotFound:
+      description: Entry Not Found
+      content:
+        text/plain: { schema: { type: string, example: "Entry not found" } }
+    InternalError:
+      description: Internal Server Error (Engine Uninitialized)
+      content:
+        text/plain: { schema: { type: string, example: "Engine not initialized" } }
+
+paths:
+  /entries:
+    post:
+      summary: Create a new entry
+      requestBody:
+        required: true
+        content:
+          application/json: 
+            schema: { $ref: '#/components/schemas/Entry' }
+          application/x-protobuf: 
+            schema: { type: string, format: binary }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Entry' } }
+            application/x-protobuf: { schema: { type: string, format: binary } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /entries/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: "The unique identifier for the entry."
+        schema: { type: integer, format: int64 }
+    get:
+      summary: Read an entry
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Entry' } }
+            application/x-protobuf: { schema: { type: string, format: binary } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+    put:
+      summary: Update an existing entry
+      description: "Note: The ID provided in the URL path will overwrite any ID provided in the request body."
+      requestBody:
+        required: true
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Entry' } }
+          application/x-protobuf: { schema: { type: string, format: binary } }
+      responses:
+        '200':
+          description: Updated successfully
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Entry' } }
+            application/x-protobuf: { schema: { type: string, format: binary } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+    delete:
+      summary: Delete an entry
+      responses:
+        '204':
+          description: Deleted (No Content)
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }

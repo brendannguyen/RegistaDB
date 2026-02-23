@@ -14,11 +14,11 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 - Java client that supports basic scalar values, basic lists, string maps, json and bytes.
 - Docker deployment
 - Grafana Dashboard with Prometheus
-- REST support using Drogon
+- REST support using Drogon, with Swagger UI
 
 ### Proposed Features
 
-- Swagger UI
+- RESTful Tests
 - Control panel
 - RAM optimised mode
 - Batching mode
@@ -76,11 +76,18 @@ volumes:
 cpuset: "0-3"
 ```
 
+7. To disable Swagger UI:
+
+```
+- ENABLE_SWAGGER_UI=false
+```
+
 ### Endpoints
 
 - RocksDB metrics: http://localhost:8080
 - Grafana: http://localhost:3000
 - RESTful: http://localhost:8081
+- Swagger UI: http://localhost:8081/app/docs/
 - *(see docker-compose.yml)*
 
 ### JAVA Client Usage
@@ -137,6 +144,7 @@ Response deleteResp = client.delete(testId);
 ```
 
 ### RESTful Usage
+Swagger UI: http://localhost:8081/app/docs/
 
 #### Creating entries:
 ```POST http://localhost:8081/entries```
