@@ -14,13 +14,13 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 - Java client that supports basic scalar values, basic lists, string maps, json and bytes.
 - Docker deployment
 - Grafana Dashboard with Prometheus
+- REST support using Drogon, with Swagger UI
 
 ### Proposed Features
 
 - Control panel
 - RAM optimised mode
 - Batching mode
-- REST support
 - Scalability support
 - Small app/backend example
 
@@ -55,9 +55,9 @@ environment:
 ```
 
 ```
-docker compose up --build --profile metrics
+docker compose --profile metrics up --build
 
-docker compose down --build --profile metrics
+docker compose --profile metrics down --build 
 ```
 
 5. To change database store path inside container:
@@ -67,6 +67,27 @@ environment:
 volumes:
   - ./server_data:<container_db_path>
 ```
+
+6. To change CPU set, add:
+
+```
+# e.g.
+cpuset: "0-3"
+```
+
+7. To disable Swagger UI:
+
+```
+- ENABLE_SWAGGER_UI=false
+```
+
+### Endpoints
+
+- RocksDB metrics: http://localhost:8080/metrics
+- Grafana: http://localhost:3000
+- RESTful: http://localhost:8081
+- Swagger UI: http://localhost:8081/app/docs/
+- *(see docker-compose.yml)*
 
 ### JAVA Client Usage
 
@@ -121,7 +142,87 @@ Response updateResp = client.update(entry)
 Response deleteResp = client.delete(testId);
 ```
 
+### RESTful Usage
+Swagger UI: http://localhost:8081/app/docs/
+
+#### Creating entries:
+```POST http://localhost:8081/entries```
+
+JSON:
+```
+# "id" field not required
+curl -X POST http://localhost:8081/entries \
+     -H "Content-Type: application/json" \
+     -d '{"metadata": {
+            "source": "thermal_sensor",
+            "location": "rack_4"
+            },
+          "data": {
+            "double_value: 45.1
+          },
+          "id": 69 
+        }'
+```
+
+Protobuf format:
+```
+curl -X POST http://localhost:8081/entries \
+     -H "Content-Type: application/x-protobuf" \
+     --data-binary @entry.bin
+```
+
+#### Reading entries:
+```GET http://localhost:8081/entries/{id}```
+
+JSON:
+```
+curl -X GET http://localhost:8081/entries/100 \
+     -H "Accept: application/json"
+```
+
+Protobuf format:
+```
+curl -X GET http://localhost:8081/entries/100 \
+     -H "Accept: application/x-protobuf" \
+     --output response.bin
+```
+
+#### Updating entries:
+```PUT http://localhost:8081/entries{id}```
+
+JSON:
+```
+# "id" field not required (overwritten by id in endpoint)
+curl -X PUT http://localhost:8081/entries/69 \
+     -H "Content-Type: application/json" \
+     -d '{"metadata": {
+            "source": "thermal_sensor",
+            "location": "rack_4"
+            },
+          "data": {
+            "double_value: 45.1
+          },
+          "id": 69 
+        }'
+```
+
+Protobuf format:
+```
+curl -X POST http://localhost:8081/entries/69 \
+     -H "Content-Type: application/x-protobuf" \
+     --data-binary @entry.bin
+```
+
+#### Deleting entries:
+```DELETE http://localhost:8081/entries{id}```
+
 ### Setup RocksDB & RegistaDB Engine
+
+0. Clone repository
+
+```
+git clone --recursive https://github.com/brendannguyen/RegistaDB.git
+```
 
 1. Install dependencies
 
@@ -132,6 +233,9 @@ sudo apt install build-essential gdb
 sudo apt install protobuf-compiler
 sudo apt install libzmq3-dev
 sudo apt install prometheus-cpp-dev
+sudo apt install git gcc g++ cmake
+sudo apt install libjsoncpp-dev
+sudo apt install uuid-dev
 ```
 
 2. Create C++ build files
@@ -142,7 +246,7 @@ mkdir regista_db/build
 cd regista_db/build
 
 cmake ..
-make
+make -j$(nproc)
 ```
 
 3. Run the engine
@@ -182,7 +286,7 @@ mvn exec:java -Dexec.mainClass="com.registadb.Producer" -Dexec.args="500"
 ```
 cd regista_db/build
 cmake ..
-make
+make -j$(nproc)
 ```
 
 ### Engine Changes (src, c++)
@@ -191,7 +295,7 @@ make
 
 ```
 cd regista_db/build
-make && ./registadb_engine
+make -j$(nproc) && ./registadb_engine
 ```
 
 ### Client changes (java)
@@ -217,7 +321,7 @@ mvn exec:java -Dexec.mainClass="com.registadb.Producer"
 
 ```
 cd regista_db/build
-make
+make -j$(nproc)
 ```
 
 2. Run tests

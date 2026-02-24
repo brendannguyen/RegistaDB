@@ -1,11 +1,17 @@
 #include <csignal>
 #include <atomic>
 #include <cstdlib>
+#include <thread>
+#include <algorithm>
+#include <pthread.h>
+#include <drogon/drogon.h>
 #include "MetricsExporter.hpp"
 #include "StorageManager.h"
 #include "RegistaServer.h"
 
 std::atomic<bool> keep_running(true);
+RegistaServer* g_regista_server = nullptr;
+namespace fs = std::filesystem;
 
 /**
  * @brief Handles system signals (e.g., SIGINT) to gracefully shut down the server.
@@ -59,11 +65,89 @@ int main(int argc, char* argv[]) {
     }
 
     RegistaServer server(storage, 5555, 5556);
+    g_regista_server = &server;
 
-    std::cout << "RegistaDB Engine Started..." << std::endl;
-    std::cout << "Ingest: 5555 | Query: 5556" << std::endl;
+    unsigned int num_cores = std::thread::hardware_concurrency();
+    std::cout << "System detected with " << num_cores << " cores." << std::endl;
+    int drogon_thread_count = (num_cores > 1) ? (num_cores - 1) : 1;
+    drogon::app().setThreadNum(drogon_thread_count);
 
-    server.Run();
+    std::thread zmq_thread([&server, num_cores]() {
+        if (num_cores > 1) {
+            cpu_set_t cpuset;
+            CPU_ZERO(&cpuset);
+            CPU_SET(0, &cpuset);
+            pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+            std::cout << "[Affinity] ZMQ Engine pinned to Core 0" << std::endl;
+        }
+        std::cout << "RegistaDB Engine Started..." << std::endl;
+        std::cout << "Ingest: 5555 | Query: 5556" << std::endl;
+        server.Run();
+    });
+
+    drogon::app().registerPreRoutingAdvice([num_cores](const drogon::HttpRequestPtr &, 
+                                                        drogon::AdviceCallback &&cb, 
+                                                        drogon::AdviceChainCallback &&cccb) {
+        if (num_cores > 1) {
+            thread_local bool is_pinned = false;
+            if (!is_pinned) {
+                static std::atomic<int> next_core(1);
+                int target = next_core++ % num_cores;
+                if (target == 0) target = 1; // double check to keep Core 0 free for ZMQ
+
+                cpu_set_t cpuset;
+                CPU_ZERO(&cpuset);
+                CPU_SET(target, &cpuset);
+                pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+                
+                std::cout << "[Affinity] Drogon worker thread initialized on Core " << target << std::endl;
+                is_pinned = true;
+            }
+        }
+        cccb(); // continue to the actual controller
+    });
+
+    bool enable_swagger_ui = false;
+    const char* env_swagger_ui = std::getenv("ENABLE_SWAGGER_UI");
+    if (env_swagger_ui && (std::string(env_swagger_ui) == "true" || std::string(env_swagger_ui) == "1")) {
+        enable_swagger_ui = true;
+    }
+
+    if (enable_swagger_ui) {
+        std::vector<std::string> paths = {
+            "/app/static",                 // Docker path
+            "./static",                    
+            "../static",                   
+            "../../static",
+            "../../../static"                
+        };
+
+        std::string foundPath = "";
+        for (const auto& p : paths) {
+            if (fs::exists(p + "/app/docs/index.html")) {
+                foundPath = p;
+                break;
+            }
+        }
+
+        if (!foundPath.empty()) {
+            std::cout << "Swagger UI is ENABLED at /app/docs/index.html" << std::endl;
+            drogon::app().setDocumentRoot(foundPath);
+            drogon::app().setFileTypes({"html", "js", "css", "yaml", "json", "png", "txt"});
+        }
+    }
+
+    std::cout << "RESTful: 8081" << std::endl;
+    drogon::app().addListener("0.0.0.0", 8081).run();
+
+    std::cout << "Shutting down..." << std::endl;
+    
+    keep_running = false; 
+    server.Stop();
+
+    if (zmq_thread.joinable()) {
+        zmq_thread.join();
+    }
 
     std::cout << "Shutting down metrics bridge..." << std::endl;
     StopMetricsBridge();

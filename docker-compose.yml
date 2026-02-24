@@ -4,12 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5555:5555"
-      - "5556:5556"
+      - "5555:5555" # ZMQ Ingest
+      - "5556:5556" # ZMQ Query
       - "8080:8080" # Metrics
+      - "8081:8081" # RESTful
     environment:
       - REGISTADB_STORE_PATH=/data
       - ENABLE_STATS=false
+      - ENABLE_SWAGGER_UI=true
     volumes:
       - ./server_data:/data
     command: ["./registadb_engine"]

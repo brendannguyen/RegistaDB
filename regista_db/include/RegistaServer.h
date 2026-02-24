@@ -6,11 +6,16 @@
 #include "StorageManager.h"
 #include "playbook.pb.h"
 
+namespace api {
+    class EntryController;
+}
+
 /**
  * @brief Manages the main server loop, handling both ingest and query sockets, and orchestrating interactions with StorageManager.
  * 
  */
 class RegistaServer {
+    friend class api::EntryController;
 public:
     RegistaServer(StorageManager& storage, int ingest_port, int query_port);
     void Run();
@@ -29,6 +34,7 @@ private:
 protected:
     bool PrepareEntry(registadb::Entry& entry);
     void SendResponse(const registadb::Response& resp);
+    registadb::Response ExecuteRequest(const registadb::Request& req); 
 };
 
 #endif

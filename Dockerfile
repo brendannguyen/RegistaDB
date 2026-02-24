@@ -5,6 +5,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
+    git \
+    ca-certificates \
+    pkg-config \
     protobuf-compiler \
     libprotobuf-dev \
     librocksdb-dev \
@@ -16,6 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzmq3-dev \
     cppzmq-dev \
     prometheus-cpp-dev \
+    libjsoncpp-dev \
+    uuid-dev \
+    libcurl4-openssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . .
@@ -23,8 +29,8 @@ COPY . .
 WORKDIR /app/regista_db
 RUN mkdir -p build && \
     cd build && \
-    cmake .. && \
-    make
+    cmake .. -DCMAKE_BUILD_TYPE=Release && \
+    make -j$(nproc)
 
 # Runtime
 FROM debian:bookworm-slim
@@ -42,10 +48,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzmq5 \
     libprometheus-cpp-core1.0 \
     libprometheus-cpp-pull1.0 \
+    libjsoncpp25 \
+    libuuid1 \
+    libcurl4 \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/regista_db/build/registadb_engine .
+COPY --from=builder /app/static ./static
+RUN chmod -R 755 /root/static
 
 EXPOSE 5555
 EXPOSE 5556
+EXPOSE 8080
+EXPOSE 8081
 CMD ["./registadb_engine", "--path", "/data"]

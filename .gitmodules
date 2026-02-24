@@ -1,0 +1,3 @@
+[submodule "regista_db/drogon"]
+	path = regista_db/drogon
+	url = https://github.com/drogonframework/drogon
