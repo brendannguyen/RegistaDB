@@ -5,6 +5,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
+    git \
+    ca-certificates \
+    pkg-config \
     protobuf-compiler \
     libprotobuf-dev \
     librocksdb-dev \
@@ -18,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     prometheus-cpp-dev \
     libjsoncpp-dev \
     uuid-dev \
+    libcurl4-openssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . .
@@ -46,6 +50,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libprometheus-cpp-pull1.0 \
     libjsoncpp25 \
     libuuid1 \
+    libcurl4 \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/regista_db/build/registadb_engine .

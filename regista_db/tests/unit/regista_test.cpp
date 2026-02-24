@@ -43,7 +43,7 @@ public:
 
 TEST_F(ServerLogicTest, PrepareEntry) {
     
-    RegistaServerTester* server = new  RegistaServerTester(*storage, 5555, 5556);
+    RegistaServerTester* server = new  RegistaServerTester(*storage, 0, 0);
 
     registadb::Entry obj;
     obj.set_id(500);
@@ -56,4 +56,6 @@ TEST_F(ServerLogicTest, PrepareEntry) {
     
     // After preparation, timestamp should be set to a non-zero value (e.g., current time)
     ASSERT_NE(obj.created_at().seconds(), 0);
+
+    delete server;
 }

@@ -18,7 +18,6 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 
 ### Proposed Features
 
-- RESTful Tests
 - Control panel
 - RAM optimised mode
 - Batching mode
@@ -84,7 +83,7 @@ cpuset: "0-3"
 
 ### Endpoints
 
-- RocksDB metrics: http://localhost:8080
+- RocksDB metrics: http://localhost:8080/metrics
 - Grafana: http://localhost:3000
 - RESTful: http://localhost:8081
 - Swagger UI: http://localhost:8081/app/docs/

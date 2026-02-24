@@ -70,7 +70,7 @@ namespace api {
                 resp->setBody(std::move(jsonStr));
             }
         } else {
-            resp->setBody("Entry not found");
+            resp->setBody("Entry not found\n");
         }
         callback(resp);
     }

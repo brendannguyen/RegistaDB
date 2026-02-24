@@ -73,10 +73,19 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+# CPR
+include(FetchContent)
+set(CPR_ENABLE_SSL OFF CACHE INTERNAL "")
+set(CPR_USE_SYSTEM_CURL ON CACHE INTERNAL "")
+FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/libcpr/cpr.git
+                         GIT_TAG f091b2c061b307ee89b164c39976fc9202a1c79d)
+FetchContent_MakeAvailable(cpr)
+
 # Create the test executable
 add_executable(regista_tests 
     tests/unit/storage_test.cpp 
     tests/unit/regista_test.cpp
+    tests/integration/rest_test.cpp
     src/StorageManager.cpp
     src/RegistaServer.cpp
     src/MetricsExporter.cpp 
@@ -102,6 +111,7 @@ target_link_libraries(regista_tests PRIVATE
     prometheus-cpp::pull
     pthread dl
     drogon
+    cpr::cpr
 )
 
 # This enables the 'make test' command and automatic test discovery
