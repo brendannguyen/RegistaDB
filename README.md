@@ -28,6 +28,13 @@ A high-performance C++ middleware engine/DBMS using RocksDB to orchestrate data 
 
 ### Docker deployment of RegistaDB
 
+0. Clone repository
+
+```
+git clone --recursive https://github.com/brendannguyen/RegistaDB.git
+cd RegistaDB
+```
+
 1. Running for first time:
 ```
 # without metrics
@@ -216,7 +223,7 @@ curl -X POST http://localhost:8081/entries/69 \
 #### Deleting entries:
 ```DELETE http://localhost:8081/entries{id}```
 
-### Setup RocksDB & RegistaDB Engine
+### Setup RocksDB & RegistaDB Engine (non-docker deployment)
 
 0. Clone repository
 
